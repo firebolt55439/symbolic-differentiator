@@ -143,7 +143,10 @@ $(function() {
 			if(operators.indexOf(on) !== -1){
 				out_str += " ";
 			}
-			if((isLetter(on) || isNumber(on)) && operators.indexOf(next) === -1 && !["{", "(", ")", "}", " ", ""].includes(next)){
+			if((isLetter(on) || isNumber(on)) &&
+				operators.indexOf(next) === -1 &&
+				!["{", "(", ")", "}", " ", ""].includes(next)
+				&& (isLetter(on) || (isNumber(on) && !isNumber(next)))){
 				out_str += " * ";
 			}
 			if(on === "-" && (prev === "" || prev === "\{" || prev === "(")){
@@ -206,10 +209,16 @@ $(function() {
 		  	output_raw = output_raw.replace("-1 '* ", "-");
 		  	for(var i = 0; i < output_raw.length; i++){
 		  		var on = output_raw[i];
+		  		var next = "";
+		  		var j = i + 1;
+		  		while(j < output_raw.length && output_raw[j] === " ") ++j;
+		  		if(output_raw[j] !== " ") next = output_raw[j];
 		  		if(on == "'") continue;
 		  		if(on == "*"){
 		  			// output += "\\ ";
-		  			continue;
+		  			if(next !== "("){
+		  				continue;
+		  			}
 		  		}
 		  		if(on == "^"){
 		  			passed_exp = true;
