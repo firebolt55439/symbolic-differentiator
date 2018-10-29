@@ -4,6 +4,8 @@ x^{3xy}+e^{i\pi }+\frac{3}{\left(\frac{5}{3}\right)}+x^{z^3-2w}+\frac{2}{3}
 x^2ye^{\frac{y}{z}}
 -x-e^{2-3x}+e^{-2x}
 
+Fix partial power in icon, fold multiple partials in row by power
+Implement generic cancellation in fractions (e.g. (a1 * a2 * ... * an) / (b1 * b2 * ... * bn))
 Implement cancellation in conjunction with multiplication (a * 1/a = 1) --> test case: x^{3xy}
 
 Find gradient with respect to detected variables

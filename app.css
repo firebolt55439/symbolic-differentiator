@@ -3,3 +3,6 @@ body {
 	color: white;
 }
 
+#wrt_disp, #detected_vars {
+	border-color: transparent;
+}
