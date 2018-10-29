@@ -1,0 +1,17 @@
+TODO:
+
+x^{3xy}+e^{i\pi }+\frac{3}{\left(\frac{5}{3}\right)}+x^{z^3-2w}+\frac{2}{3}
+x^2ye^{\frac{y}{z}}
+-x-e^{2-3x}+e^{-2x}
+
+Implement cancellation in conjunction with multiplication (a * 1/a = 1) --> test case: x^{3xy}
+
+Find gradient with respect to detected variables
+Find all mixed partial derivatives to arbitrary order (fxx, fxy, fyy, fyx)
+Solve implicitly defined relations efficiently using the Implicit Function Theorem (no need for wonky chain rule stuff that way)
+	-> Implement in Scheme, move everything to one side, use make-div, optimize
+
+Improve web interface
+Add sidebar with sample derivatives (make them super ugly seeming / hard and ensure they all work)
+Add view in WolframAlpha button / shortcut
+

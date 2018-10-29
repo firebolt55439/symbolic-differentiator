@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Symbolic Differentiator</title>
+	<link rel="stylesheet" href="/mathquill.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/mathquill.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+	<script type="text/javascript" src="/biwascheme-0.6.8-min.js"></script>
+	<script src="/app.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="/app.css">
+</head>
+<body>
+
+<p>Output: <div>
+	<span id="problem">`x=(-b+-sqrt(b^2 - 4ac)) / (2a)`</span>
+	<span id="problem2" style="display: none;"></span>
+</div>.</p>
+
+<p style="color: orange; display: none;" id="error_box">Error: <span id="error_message"></span></p>
+<p>Detected Variables: <span id="detected_vars">x</span></p>
+<p>Differentiate: <span id="answer">x</span></p>
+<p> With respect to: <span id="wrt">x</span></p>
+<p>Solve for:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mixed partial derivative with respect to <span id="wrt_arr">x, y</span> from left-to-right</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All mixed partial derivatives of order <span id="order_num">2</span> with respect to variables specified above</p>
+
+</body>
+</html>
