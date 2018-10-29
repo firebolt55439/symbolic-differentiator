@@ -1,3 +1,9 @@
+String.prototype.replaceAll = function(search, replacement) {
+	// From https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+    var target = this;
+    return target.split(search).join(replacement);
+};
+
 $(function() {
 	// Instantiate interpreter
 	var displayError = function(err) {
@@ -73,10 +79,10 @@ $(function() {
 	var latex2ascii = function(latex) {
 		// Do broad replace-rules.
 		latex = latex.slice(0);
-		latex = latex.replace("^{ }", "");
-		latex = latex.replace("\\cdot", " * ");
-		latex = latex.replace("\\left", " ");
-		latex = latex.replace("\\right", " ");
+		latex = latex.replaceAll("^{ }", "");
+		latex = latex.replaceAll("\\cdot", " * ");
+		latex = latex.replaceAll("\\left", " ");
+		latex = latex.replaceAll("\\right", " ");
 
 		// Do a pass through the string, adding space where necessary
 		var out_str = '';
@@ -206,7 +212,7 @@ $(function() {
 		  		output_raw = output_raw.slice(1, -1);
 		  	}
 		  	var passed_exp = false;
-		  	output_raw = output_raw.replace("-1 '* ", "-");
+		  	output_raw = output_raw.replaceAll("-1 '* ", "-");
 		  	for(var i = 0; i < output_raw.length; i++){
 		  		var on = output_raw[i];
 		  		var next = "";
@@ -249,12 +255,12 @@ $(function() {
 		  	for(var func of IMPLEMENTED_FUNCTIONS.split(" ")){
 		  		var regex = new RegExp("(( )|^)(" + func + ")( )", "gm");
 		  		var replacement = "\\" + func;
-		  		output = output.replace(regex, replacement);
+		  		output = output.replaceAll(regex, replacement);
 		  	}
 		  	console.log("Processed:", output);
 
 		  	// Generate LaTeX display
-		  	latex_eqn = latex_eqn.replace("operatorname", "text");
+		  	latex_eqn = latex_eqn.replaceAll("operatorname", "text");
 		  	var preamble = `\\frac{\\partial}{${wrtVar}}\\left(`;
 		  	var postamble = `\\right) = ${output}`;
 		  	var latex_str = preamble + latex_eqn + postamble;
