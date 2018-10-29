@@ -255,7 +255,7 @@ $(function() {
 		  	for(var func of IMPLEMENTED_FUNCTIONS.split(" ")){
 		  		var regex = new RegExp("(( )|^)(" + func + ")( )", "gm");
 		  		var replacement = "\\" + func;
-		  		output = output.replaceAll(regex, replacement);
+		  		output = output.replace(regex, replacement);
 		  	}
 		  	console.log("Processed:", output);
 
