@@ -234,6 +234,9 @@
         ((and (product? m1) (number? (multiplier m1))) ; (kx)b = k(xb)
           (make-product (multiplier m1) (make-product m2 (multiplicand m1)))
         )
+        ((and (exp? m1) (symbol? m2)) ; bring variable coefficients in front of exponentials
+          (make-product m2 m1)
+        )
         (else (list '* m1 m2))))
 (define (product? x)
   (and (list? x) (eq? (car x) '*)))

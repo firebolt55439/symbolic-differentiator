@@ -355,7 +355,7 @@ $(function() {
 		  		preamble = preamble.replaceAll("\\partial", "d");
 		  	}
 		  	var postamble = `\\right) = ${output}`;
-		  	var latex_str = preamble + lastFuncString + postamble;
+		  	var latex_str = preamble + lastFuncString.replaceAll('\\ ', '') + postamble;
 		  	var tock_id = tockers[tock];
 		  	$(tock_id).css('display', 'none');
 		  	$(tock_id).html("`" + latex_str + "`");
