@@ -1,3 +1,9 @@
+String.prototype.replaceAll = function(search, replacement) {
+	// From https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+    var target = this;
+    return target.split(search).join(replacement);
+};
+
 $(function() {
 	// Instantiate interpreter
 	var displayError = function(err) {
@@ -10,11 +16,11 @@ $(function() {
 	};
 	var showSuccessColors = function() {
 		$('#answer').css('border-color', 'green');
-		$('#detected_vars').css('border-color', 'green');
+		// $('#detected_vars').css('border-color', 'green');
 	};
 	var showFailureColors = function() {
 		$('#answer').css('border-color', 'orange');
-		$('#detected_vars').css('border-color', 'orange');
+		// $('#detected_vars').css('border-color', 'orange');
 	};
 	BiwaScheme.define_libfunc("derivative-dne", 1, 1, function(ar){
 		console.warn(ar);
@@ -73,10 +79,10 @@ $(function() {
 	var latex2ascii = function(latex) {
 		// Do broad replace-rules.
 		latex = latex.slice(0);
-		latex = latex.replace("^{ }", "");
-		latex = latex.replace("\\cdot", " * ");
-		latex = latex.replace("\\left", " ");
-		latex = latex.replace("\\right", " ");
+		latex = latex.replaceAll("^{ }", "");
+		latex = latex.replaceAll("\\cdot", " * ");
+		latex = latex.replaceAll("\\left", " ");
+		latex = latex.replaceAll("\\right", " ");
 
 		// Do a pass through the string, adding space where necessary
 		var out_str = '';
@@ -170,35 +176,75 @@ $(function() {
 	var tock = 1, tockers = ["#problem", "#problem2"];
 	var generateSchemeCmd = function(ascii_rep, wrt_arr) {
 		var ret = `'(${ascii_rep})`;
+		var had_one = false;
 		while(wrt_arr.length > 0){
+			if(had_one){
+				ret = `(car ${ret})`;
+			}
 			ret = `(derive-infix ${ret} '${wrt_arr.shift()})`;
+			had_one = true;
 		}
 		return ret;
 	};
 	const GREEK_LETTERS = 'pi theta alpha beta gamma';
 	const IMPLEMENTED_FUNCTIONS = 'sin cos tan sinh cosh tanh log ln sqrt';
 	const CONSTANT_VAR_NAMES = ["i", "e"] + GREEK_LETTERS.split(' ');
+	var lastFuncString = "f(x)";
 	var handleOutputChange = function(wrt) {
 		// Modify DOM element
 		hideError();
+
+		// Generate w.r.t. preamble and postamble
 		var wrtVar = wrt || wrtMathField.latex();
-		var wrtArr = wrtVar.split(",");
-		wrtVar = "";
-		for(var i = wrtArr.length - 1; i >= 0; i--){
-			wrtVar += `\\partial ${wrtArr[i]} `;
+		var wrtArr = wrtVar.split(",").filter(x => x.length > 0);
+		if(wrt){
+			wrtDisplaySpan.latex(`f_{${wrtArr.join("")}}`);
 		}
+		var wrtNum = wrtArr.length;
+		(function() {
+			var wrtArrTemp = wrtArr.map(x => `\\partial ${x}`);
+			var stack = [];
+			for(var item of wrtArrTemp){
+				if(stack.length > 0){
+					var top = stack[stack.length - 1];
+					if(item == top[0]){
+						stack.push([stack.pop()[0], top[1] + 1]);
+						continue;
+					}
+				}
+				stack.push([item, 1]);
+			}
+			stack = stack.map((x) => {
+				if(x[1] == 1) return x[0];
+				return `${x[0]}^{${x[1]}}`;
+			});
+			stack = stack.reverse(); // right-most partial is inside-most evaluation
+			wrtVar = stack.join(" ");
+		})(); // avoid polluting function namespace
+
+		// Parse and process LaTeX input
 		var latex_eqn = answerMathField.latex();
 		latex_eqn = stripLatexSpaces(latex_eqn);
 		var ascii_rep = latex2ascii(latex_eqn);
 		console.log("LaTeX:", latex_eqn);
 		console.log("ASCII:", ascii_rep);
+
+		// Generate Scheme command
 		var scheme_cmd = generateSchemeCmd(ascii_rep, wrtArr);
+		console.log("Scheme:", scheme_cmd);
+
+		// Perform Scheme evaluation
 		biwa.evaluate(scheme_cmd, function(result) {
 			// Javascript-ize Scheme output
 		  	showSuccessColors();
 		  	var output_res = result.to_array();
-		  	var detected_vars = output_res[1].to_set().arr.map(x => x.name).filter(x => !CONSTANT_VAR_NAMES.includes(x));
-		  	detectedVarsSpan.latex(detected_vars.join(","));
+	  	  	if(wrtNum == 1){
+	  			var detected_vars = output_res[1];
+	  			detected_vars = detected_vars.to_set().arr;
+	  			detected_vars = detected_vars.map(x => x.name).filter(x => !CONSTANT_VAR_NAMES.includes(x));
+	  			lastFuncString = `f(${detected_vars.join(", ")})`;
+	  		}
+		  	detectedVarsSpan.latex(`${lastFuncString} = ${latex_eqn}`);
 		  	var output_raw = output_res[0].toString();
 		  	console.log("Raw output:", output_raw);
 		  	var output = '';
@@ -206,7 +252,7 @@ $(function() {
 		  		output_raw = output_raw.slice(1, -1);
 		  	}
 		  	var passed_exp = false;
-		  	output_raw = output_raw.replace("-1 '* ", "-");
+		  	output_raw = output_raw.replaceAll("-1 '* ", "-");
 		  	for(var i = 0; i < output_raw.length; i++){
 		  		var on = output_raw[i];
 		  		var next = "";
@@ -254,10 +300,10 @@ $(function() {
 		  	console.log("Processed:", output);
 
 		  	// Generate LaTeX display
-		  	latex_eqn = latex_eqn.replace("operatorname", "text");
-		  	var preamble = `\\frac{\\partial}{${wrtVar}}\\left(`;
+		  	latex_eqn = latex_eqn.replaceAll("operatorname", "text");
+		  	var preamble = `\\frac{\\partial${(wrtNum > 1 ? `^{${wrtNum}}` : "")}}{${wrtVar}}\\left(`;
 		  	var postamble = `\\right) = ${output}`;
-		  	var latex_str = preamble + latex_eqn + postamble;
+		  	var latex_str = preamble + lastFuncString + postamble;
 		  	var tock_id = tockers[tock];
 		  	$(tock_id).css('display', 'none');
 		  	$(tock_id).html("`" + latex_str + "`");
@@ -317,7 +363,8 @@ $(function() {
 		}
 	});
 
-	// Initialize detected variables output
+	// Initialize output fields
 	var detectedVarsSpan = MQ.MathField(document.getElementById('detected_vars'), {});
 	showSuccessColors();
+	var wrtDisplaySpan = MQ.MathField(document.getElementById('wrt_disp'), {});
 });

@@ -154,6 +154,12 @@
     ((and (function? base) (eq? (car base) 'sqrt) (number? exponent)) ; sqrt(x)^a = x^(a/2)
       (make-exp (cadr base) (make-div exponent 2))
     )
+    ((and (product? base) (number? (multiplier base)) (exp? (multiplicand base)))
+      (make-product
+        (make-exp (multiplier base) exponent)
+        (make-exp (cadr (multiplicand base)) (make-product (caddr (multiplicand base)) exponent))
+      )
+    )
     (else (list '^ base exponent)))
 )
 
@@ -245,6 +251,9 @@
             (make-exp (base m1) (make-subtraction (exponent m1) 1))
             (make-div 1 (make-exp (base m2) (make-subtraction (exponent m2) 1)))
           )
+        )
+        ((and (product? m1) (number? (multiplier m1))) ; simplify (kx)/y = k*(x/y)
+          (make-product (multiplier m1) (make-div (multiplicand m1) m2))
         )
         ((and (exp? m2) (number? (exponent m2)) (< (exponent m2) 0)) ; simplify negative exponents of form x/y^(-2) = xy^2
           (make-product m1 (make-exp (base m2) (- (exponent m2))))
