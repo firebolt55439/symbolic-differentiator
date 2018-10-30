@@ -12,15 +12,13 @@ $(function() {
 	};
 	var hideError = function() {
 		$('#error_box').hide();
-		$('#answer').css('border-color', '');
+		$('#answer').removeClass('syntax-outline').removeClass('success-outline');
 	};
 	var showSuccessColors = function() {
-		$('#answer').css('border-color', 'green');
-		// $('#detected_vars').css('border-color', 'green');
+		$('#answer').removeClass('syntax-outline').addClass('success-outline');
 	};
 	var showFailureColors = function() {
-		$('#answer').css('border-color', 'orange');
-		// $('#detected_vars').css('border-color', 'orange');
+		$('#answer').addClass('syntax-outline').removeClass('success-outline');
 	};
 	BiwaScheme.define_libfunc("derivative-dne", 1, 1, function(ar){
 		console.warn(ar);

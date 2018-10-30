@@ -35,6 +35,9 @@
             (make-subtraction a2 (multiplier a1))
           )
         )
+        ((equal? a1 a2)
+          (make-product 2 a1)
+        )
         ((and (product? a2) (or (=number? (multiplier a2) -1) (=number? (multiplicand a2) -1)))
           (make-sum a2 a1)
         )
@@ -51,6 +54,58 @@
 (define (augend s) (caddr s))
 
 ; Products are represented as lists that start with *.
+(define (contains-product-chain lst var)
+  (cond
+    ((null? lst) #f)
+    ((not (product? lst)) #f)
+    ((or
+      (equal? (multiplier lst) var)
+      (equal? (multiplicand lst) var)
+    ) #t)
+    (else (or (contains-product-chain (multiplier lst) var) (contains-product-chain (multiplicand lst) var)))
+  )
+) ; search for given var in (a * b * c ...) chain
+(define (find-product-chain lst var)
+  (cond
+    ((null? lst) nil)
+    ((not (product? lst)) lst)
+    ((or
+      (equal? (multiplier lst) var)
+      (equal? (multiplicand lst) var)
+    )
+      (if (equal? (multiplier lst) var)
+        (multiplicand lst)
+        (multiplier lst)
+      )
+    )
+    (else (list '* (find-product-chain (multiplier lst) var) (find-product-chain (multiplicand lst) var)))
+  )
+) ; return a new operation tree removing first instance of given var in (a * b * c ...) chain
+(define (contains-product-exp-chain lst var)
+  (cond
+    ((null? lst) #f)
+    ((exp? lst) (equal? (base lst) var))
+    ((not (product? lst)) #f)
+    (else (or (contains-product-exp-chain (multiplier lst) var) (contains-product-exp-chain (multiplicand lst) var)))
+  )
+) ; search for given var as base of exp in (a * b * c ...) chain
+(define last-product-exp-chain nil)
+(define (find-product-exp-chain lst var)
+  (cond
+    ((null? lst) nil)
+    ((not (product? lst)) lst)
+    ((or
+      (and (exp? (multiplier lst)) (equal? (base (multiplier lst)) var))
+      (and (exp? (multiplicand lst)) (equal? (base (multiplicand lst)) var))
+    )
+      (if (equal? (base (multiplier lst)) var)
+        (begin (set! last-product-exp-chain (exponent (multiplier lst))) (multiplicand lst))
+        (begin (set! last-product-exp-chain (exponent (multiplicand lst))) (multiplier lst))
+      )
+    )
+    (else (list '* (find-product-exp-chain (multiplier lst) var) (find-product-exp-chain (multiplicand lst) var)))
+  )
+) ; return a new operation tree removing first instance of given var as base of exp in (a * b * c ...) chain
 (define (make-product m1 m2)
   ; (console-log "Product called on" m1 m2)
   (cond ((or (=number? m1 0) (=number? m2 0)) 0) ; x * 0 = x
@@ -79,6 +134,33 @@
             (multiplicand m2)
           )
         )
+        ((and (product? m2) (contains-product-chain m2 m1)) ; power folding in product chains
+          (make-product
+            (make-exp m1 2)
+            (find-product-chain m2 m1)
+          )
+        )
+        ((and (product? m2) (contains-product-exp-chain m2 m1)) ; power folding in product chains with exponent
+          (make-product
+            (make-exp m1 (make-sum last-product-exp-chain 1))
+            (find-product-exp-chain m2 m1)
+          )
+        )
+        ((and (exp? m1) (product? m2) (contains-product-exp-chain m2 (base m1))) ; power folding in exponent times product chains with exponent
+          (make-product
+            (make-exp (base m1) (make-sum last-product-exp-chain (exponent m1)))
+            (find-product-exp-chain m2 (base m1))
+          )
+        )
+        ((and (exp? m1) (product? m2) (contains-product-chain m2 (base m1))) ; power folding with exponent times product chains
+          (make-product
+            (make-exp (base m1) (make-sum (exponent m1) 1))
+            (find-product-chain m2 (base m1))
+          )
+        )
+        ((and (exp? m2) (product? m1)) ; reverse of above rule
+          (make-product m2 m1)
+        )
         ((and (number? m2) (product? m1) (or (number? (multiplier m1)) (number? (multiplicand m1)))) ; a(kx) = (ak)x
           (if (number? (multiplier m1))
             (make-product (* m2 (multiplier m1)) (multiplicand m1))
@@ -106,6 +188,15 @@
             )
           )
         )
+        ((and (product? m1) (product? m2) (symbol? (multiplier m1))) ; assist in power folding
+          (make-product
+            (make-product (multiplier m1) m2)
+            (multiplicand m2)
+          )
+        )
+        ((and (product? m1) (product? m2) (symbol? (multiplier m2))) ; reverse of above rule
+          (make-product m2 m1)
+        )
         ((and (function? m1) (not (function? m2))) ; bring coefficients in front of functions
           (make-product m2 m1)
         )
@@ -117,13 +208,16 @@
         ((and (or (number? m1) (symbol? m1)) (division? m2)) ; a * (b/c) = (ab)/c
           (make-div (make-product m1 (numerator m2)) (denominator m2))
         )
-        ((and (division? m1) (=number? (numerator m1) 1) (not (division? m2)))
+        ((and (division? m1) (=number? (numerator m1) 1) (not (division? m2))) ; a * (1/x) = a/x
           (make-div m2 (denominator m1))
         )
         ((and (division? m2) (=number? (numerator m2) 1) (not (division? m1)))
           (make-product m2 m1)
         )
         ((and (symbol? m2) (division? m1)) ; bring symbols in front of fractions
+          (make-product m2 m1)
+        )
+        ((and (symbol? m2) (product? m1))
           (make-product m2 m1)
         )
         (else (list '* m1 m2))))
@@ -161,10 +255,16 @@
     ((and (function? base) (eq? (car base) 'sqrt) (number? exponent)) ; sqrt(x)^a = x^(a/2)
       (make-exp (cadr base) (make-div exponent 2))
     )
-    ((and (product? base) (number? (multiplier base)) (exp? (multiplicand base)))
+    ((and (product? base) (number? (multiplier base)) (exp? (multiplicand base))) ; (kx)^n = k^n * x^n
       (make-product
         (make-exp (multiplier base) exponent)
         (make-exp (cadr (multiplicand base)) (make-product (caddr (multiplicand base)) exponent))
+      )
+    )
+    ((and (number? exponent) (product? base) (=number? (multiplier base) -1))
+      (if (even? exponent)
+        (make-exp (multiplicand base) exponent)
+        (make-product -1 (make-exp (multiplicand base) exponent))
       )
     )
     (else (list '^ base exponent)))
@@ -252,6 +352,8 @@
         ((=number? m1 0) 0)
         ((=number? m2 0) (error "Division by zero"))
         ((equal? m1 m2) 1) ; x / x = 1
+        ((=number? m2 1) m1)
+        ((and (number? m1) (number? m2) (= 0 (mod m1 m2))) (/ m1 m2))
         ((or
           (and (exp? m1) (symbol? m2) (eq? (base m1) m2))
           (and (exp? m2) (symbol? m1) (eq? (base m2) m1))) ; simplify x / x^n or x^n / x forms
@@ -296,8 +398,9 @@
             )
           )
         )
-        ((=number? m2 1) m1)
-        ((and (number? m1) (number? m2) (= 0 (mod m1 m2))) (/ m1 m2))
+        ((and (product? m2) (=number? (multiplier m2) -1))
+          (make-product -1 (make-div m1 (multiplicand m2)))
+        )
         (else (list '/ m1 m2))))
 (define (numerator expr) (cadr expr))
 (define (denominator expr) (caddr expr))
@@ -549,6 +652,18 @@
   )
 )
 
+; Extension: algebraic simplification of prefix input using make-* functions
+(define (alg-simplify expr)
+  (cond ((number? expr) expr)
+        ((variable? expr) expr)
+        ((sum? expr) (make-sum (alg-simplify (addend expr)) (alg-simplify (augend expr))))
+        ((subtraction? expr) (make-subtraction (alg-simplify (addend expr)) (alg-simplify (augend expr))))
+        ((product? expr) (make-product (alg-simplify (multiplier expr)) (alg-simplify (multiplicand expr))))
+        ((exp? expr) (make-exp (alg-simplify (base expr)) (alg-simplify (exponent expr))))
+        ((division? expr) (make-div (alg-simplify (numerator expr)) (alg-simplify (denominator expr))))
+        ((function? expr) (list (car expr) (alg-simplify (cadr expr))))
+        (else (error "Unknown type for simplification"))))
+
 ; Extension: derivative with infix input and output
 (define (leq? a b) (not (< b a)))
 (define safe-operators '(+ *))
@@ -618,7 +733,9 @@
   (set! seen-variables (list))
   (define parsed-infix (parse-infix expr))
   (console-log "Parsed Infix:" parsed-infix)
-  (define derivative (derive parsed-infix var))
+  (define simplified-infix (alg-simplify parsed-infix))
+  (console-log "Simplified Infix:" simplified-infix)
+  (define derivative (derive simplified-infix var))
   (console-log "Derivative:" derivative)
   (define ret (prefix-to-infix derivative))
   (if (not (list? ret))
