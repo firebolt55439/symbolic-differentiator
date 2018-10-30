@@ -30,14 +30,9 @@ $(function() {
 	};
 	var handleMessage = function(type, data){
 		data = data.toString();
-		if(type === "parsed-infix"){
-			$($('.debug_outputs').get(0)).text(data);
-		} else if(type === "simplified-infix"){
-			$($('.debug_outputs').get(1)).text(data);
-		} else if(type === "derivative-prefix"){
-			$($('.debug_outputs').get(2)).text(data);
-		} else if(type === "derivative-infix"){
-			$($('.debug_outputs').get(3)).text(data);
+		var idx = ["infix-input", "parsed-infix", "simplified-infix", "derivative-prefix", "derivative-infix"];
+		if(idx.includes(type)){
+			$($('.debug_outputs').get(idx.indexOf(type))).text(data);
 		}
 	};
 	BiwaScheme.define_libfunc("derivative-dne", 1, 1, function(ar){
@@ -154,6 +149,21 @@ $(function() {
 					continue;
 				}
 				out_str += " " + letter;
+				if(GREEK_LETTERS.includes(letter)){
+					next_non_space = next;
+					out_str += " ";
+					if(next !== ""){
+						var j = i + 1;
+						while(j < latex.length && latex[j] == " ") ++j;
+						next_non_space = latex[j];
+						if(latex[j] == " "){
+							next_non_space = "";
+						}
+					}
+					if(operators.indexOf(next_non_space) === -1 && !["{", "(", ")", "}", " ", ""].includes(next_non_space)){
+						out_str += " * ";
+					}
+				}
 				continue;
 			}
 			var adding_slash = (on == "\}" && next == "\{");
@@ -176,9 +186,9 @@ $(function() {
 				out_str += " ";
 			}
 			if((isLetter(on) || isNumber(on)) &&
-				operators.indexOf(next) === -1 &&
-				!["{", "(", ")", "}", " ", ""].includes(next)
-				&& (isLetter(on) || (isNumber(on) && !isNumber(next)))){
+				operators.indexOf(next_non_space) === -1 &&
+				!["{", "(", ")", "}", " ", ""].includes(next_non_space)
+				&& (isLetter(on) || (isNumber(on) && !isNumber(next_non_space)))){
 				out_str += " * ";
 			}
 			if(on === "-" && (prev === "" || prev === "\{" || prev === "(")){
@@ -227,6 +237,7 @@ $(function() {
 		if(wrt){
 			wrtDisplaySpan.latex(`f_{${wrtArr.join("")}}`);
 		}
+		wrtArr = wrtArr.map(x => x.replaceAll('\\', ''));
 		var wrtNum = wrtArr.length;
 		(function() {
 			var wrtArrTemp = wrtArr.map(x => `\\partial ${x}`);

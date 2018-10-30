@@ -106,6 +106,42 @@
     (else (list '* (find-product-exp-chain (multiplier lst) var) (find-product-exp-chain (multiplicand lst) var)))
   )
 ) ; return a new operation tree removing first instance of given var as base of exp in (a * b * c ...) chain
+(define (can-power-fold m1 m2)
+  (or
+    (and (product? m2) (contains-product-chain m2 m1)) ; power folding in product chains
+    (and (product? m2) (contains-product-exp-chain m2 m1)) ; power folding in product chains with exponent
+    (and (exp? m1) (product? m2) (contains-product-exp-chain m2 (base m1))) ; power folding in exponent times product chains with exponent
+    (and (exp? m1) (product? m2) (contains-product-chain m2 (base m1))) ; power folding with exponent times product chains
+  )
+)
+(define (fold-power m1 m2)
+  (cond
+    ((and (product? m2) (contains-product-chain m2 m1)) ; power folding in product chains
+      (make-product
+        (make-exp m1 2)
+        (find-product-chain m2 m1)
+      )
+    )
+    ((and (product? m2) (contains-product-exp-chain m2 m1)) ; power folding in product chains with exponent
+      (make-product
+        (make-exp m1 (make-sum last-product-exp-chain 1))
+        (find-product-exp-chain m2 m1)
+      )
+    )
+    ((and (exp? m1) (product? m2) (contains-product-exp-chain m2 (base m1))) ; power folding in exponent times product chains with exponent
+      (make-product
+        (make-exp (base m1) (make-sum last-product-exp-chain (exponent m1)))
+        (find-product-exp-chain m2 (base m1))
+      )
+    )
+    ((and (exp? m1) (product? m2) (contains-product-chain m2 (base m1))) ; power folding with exponent times product chains
+      (make-product
+        (make-exp (base m1) (make-sum (exponent m1) 1))
+        (find-product-chain m2 (base m1))
+      )
+    )
+  )
+)
 (define (make-product m1 m2)
   ; (console-log "Product called on" m1 m2)
   (cond ((or (=number? m1 0) (=number? m2 0)) 0) ; x * 0 = x
@@ -134,33 +170,8 @@
             (multiplicand m2)
           )
         )
-        ((and (product? m2) (contains-product-chain m2 m1)) ; power folding in product chains
-          (make-product
-            (make-exp m1 2)
-            (find-product-chain m2 m1)
-          )
-        )
-        ((and (product? m2) (contains-product-exp-chain m2 m1)) ; power folding in product chains with exponent
-          (make-product
-            (make-exp m1 (make-sum last-product-exp-chain 1))
-            (find-product-exp-chain m2 m1)
-          )
-        )
-        ((and (exp? m1) (product? m2) (contains-product-exp-chain m2 (base m1))) ; power folding in exponent times product chains with exponent
-          (make-product
-            (make-exp (base m1) (make-sum last-product-exp-chain (exponent m1)))
-            (find-product-exp-chain m2 (base m1))
-          )
-        )
-        ((and (exp? m1) (product? m2) (contains-product-chain m2 (base m1))) ; power folding with exponent times product chains
-          (make-product
-            (make-exp (base m1) (make-sum (exponent m1) 1))
-            (find-product-chain m2 (base m1))
-          )
-        )
-        ((and (exp? m2) (product? m1)) ; reverse of above rule
-          (make-product m2 m1)
-        )
+        ((can-power-fold m1 m2) (fold-power m1 m2))
+        ((can-power-fold m2 m1) (fold-power m2 m1))
         ((and (number? m2) (product? m1) (or (number? (multiplier m1)) (number? (multiplicand m1)))) ; a(kx) = (ak)x
           (if (number? (multiplier m1))
             (make-product (* m2 (multiplier m1)) (multiplicand m1))
@@ -217,8 +228,11 @@
         ((and (symbol? m2) (division? m1)) ; bring symbols in front of fractions
           (make-product m2 m1)
         )
-        ((and (symbol? m2) (product? m1))
-          (make-product m2 m1)
+        ((and (product? m2) (number? (multiplier m2))) ; a(kx) = k(ax)
+          (make-product (multiplier m2) (make-product m1 (multiplicand m2)))
+        )
+        ((and (product? m1) (number? (multiplier m1))) ; (kx)b = k(xb)
+          (make-product (multiplier m1) (make-product m2 (multiplicand m1)))
         )
         (else (list '* m1 m2))))
 (define (product? x)
@@ -727,6 +741,7 @@
 )
 (define (derive-infix expr var)
   (set! seen-variables (list))
+  (pass-message "Scheme:" expr "infix-input")
   (define parsed-infix (parse-infix expr))
   (pass-message "Parsed Infix:" parsed-infix "parsed-infix")
   (define simplified-infix (alg-simplify parsed-infix))
