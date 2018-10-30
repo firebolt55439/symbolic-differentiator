@@ -655,7 +655,7 @@
       (lambda (x) (make-div 1 (make-product 2 (make-sqrt x))))
     )
     ((eq? func 'abs)
-      (derivative-dne "Cannot take derivative of abs")
+      (derivative-dne "Derivative of absolute value does not exist")
     )
     (else (error "Unknown function derivative"))
   ))

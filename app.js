@@ -223,10 +223,11 @@ $(function() {
 		return ret;
 	};
 	const GREEK_LETTERS = 'pi theta alpha beta gamma';
-	const IMPLEMENTED_FUNCTIONS = 'sin cos tan sinh cosh tanh log ln sqrt';
+	const IMPLEMENTED_FUNCTIONS = 'sin cos tan sinh cosh tanh log ln sqrt abs';
 	const CONSTANT_VAR_NAMES = ["i", "e"] + GREEK_LETTERS.split(' ');
 	var lastFuncString = "f(x)";
 	var lastLatexEqn = "x";
+	var lastDetectedVarNum = 1;
 	var handleOutputChange = function(wrt) {
 		// Modify DOM element
 		hideError();
@@ -281,6 +282,7 @@ $(function() {
 	  			if(detected_vars.to_set){
 	  				detected_vars = detected_vars.to_set().arr;
 	  				detected_vars = detected_vars.map(x => x.name).filter(x => !CONSTANT_VAR_NAMES.includes(x));
+	  				lastDetectedVarNum = detected_vars.length;
 	  				lastFuncString = `f(${detected_vars.join(", ")})`;
 	  			}
 	  		}
@@ -342,6 +344,9 @@ $(function() {
 		  	// Generate LaTeX display
 		  	latex_eqn = latex_eqn.replaceAll("operatorname", "text");
 		  	var preamble = `\\frac{\\partial${(wrtNum > 1 ? `^{${wrtNum}}` : "")}}{${wrtVar}}\\left(`;
+		  	if(lastDetectedVarNum == 1){
+		  		preamble = preamble.replaceAll("\\partial", "d");
+		  	}
 		  	var postamble = `\\right) = ${output}`;
 		  	var latex_str = preamble + lastFuncString + postamble;
 		  	var tock_id = tockers[tock];

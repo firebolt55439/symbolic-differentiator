@@ -10,7 +10,12 @@ x^2ye^{\frac{y}{z}}
 xyxyyzyxyyzyxyzyxyzxyyzxy
 e^{\sin \left(\pi xyz\right)}\cdot \pi xyz\cdot \left(\pi +x+y\pi xy\pi z\right)
 
+Implement support for \sin ^2\left(x\right) notation
+	-> sin^2(x) notation needed
 Implement inverse trig functions
+	-> Allow both sin^-1 (x) and arcsin(x) notation
+Support |x| notation
+	-> Handle in LaTeX to ASCII; simply wrap in abs(x) recursively, handle nesting
 Implement generic cancellation in fractions (e.g. (a1 * a2 * ... * an) / (b1 * b2 * ... * bn))
 Implement cancellation in conjunction with multiplication (a * 1/a = 1) --> test case: x^{3xy}
 
