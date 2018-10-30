@@ -1,3 +1,5 @@
+hljs.initHighlightingOnLoad();
+
 String.prototype.replaceAll = function(search, replacement) {
 	// From https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
     var target = this;
@@ -20,9 +22,34 @@ $(function() {
 	var showFailureColors = function() {
 		$('#answer').addClass('syntax-outline').removeClass('success-outline');
 	};
+	var refreshCode = function() {
+		$('code.scheme').each(function(i, block){
+			hljs.highlightBlock(block);
+		});
+	};
+	var handleMessage = function(type, data){
+		data = data.toString();
+		if(type === "parsed-infix"){
+			$($('.debug_outputs').get(2)).text(data);
+		} else if(type === "simplified-infix"){
+			$($('.debug_outputs').get(3)).text(data);
+		} else if(type === "derivative-prefix"){
+			$($('.debug_outputs').get(4)).text(data);
+		} else if(type === "derivative-infix"){
+			$($('.debug_outputs').get(5)).text(data);
+		}
+	};
 	BiwaScheme.define_libfunc("derivative-dne", 1, 1, function(ar){
 		console.warn(ar);
 		displayError(ar[0]);
+	});
+	BiwaScheme.define_libfunc("pass-message", 2, 3, function(ar){
+		if(ar[0].toString().length > 0){
+			console.log(ar[0], ar[1].toString());
+		}
+		if(ar.length == 3){
+			handleMessage(ar[2].toString(), ar[1]);
+		}
 	});
 	var biwa = new BiwaScheme.Interpreter(function(e) {
 		console.error(e);
@@ -317,6 +344,7 @@ $(function() {
 		  		$(tockers[next_tock]).css('display', 'none');
 		  		$(tock_id).css('display', 'inherit');
 		  	});
+		  	refreshCode();
 		  	tock = next_tock;
 		});
 	};
