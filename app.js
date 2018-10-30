@@ -23,6 +23,7 @@ $(function() {
 		$('#answer').addClass('syntax-outline').removeClass('success-outline');
 	};
 	var refreshCode = function() {
+		$('#debug_area').show();
 		$('code.scheme').each(function(i, block){
 			hljs.highlightBlock(block);
 		});
@@ -30,13 +31,13 @@ $(function() {
 	var handleMessage = function(type, data){
 		data = data.toString();
 		if(type === "parsed-infix"){
-			$($('.debug_outputs').get(2)).text(data);
+			$($('.debug_outputs').get(0)).text(data);
 		} else if(type === "simplified-infix"){
-			$($('.debug_outputs').get(3)).text(data);
+			$($('.debug_outputs').get(1)).text(data);
 		} else if(type === "derivative-prefix"){
-			$($('.debug_outputs').get(4)).text(data);
+			$($('.debug_outputs').get(2)).text(data);
 		} else if(type === "derivative-infix"){
-			$($('.debug_outputs').get(5)).text(data);
+			$($('.debug_outputs').get(3)).text(data);
 		}
 	};
 	BiwaScheme.define_libfunc("derivative-dne", 1, 1, function(ar){
