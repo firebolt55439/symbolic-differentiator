@@ -4,6 +4,11 @@ x^{3xy}+e^{i\pi }+\frac{3}{\left(\frac{5}{3}\right)}+x^{z^3-2w}+\frac{2}{3}
 x^2ye^{\frac{y}{z}}
 -x-e^{2-3x}+e^{-2x}
 
+3 Bugs: \sin \left(x\right)^{x^{\frac{2}{-x}}}
+ - simplify -1 times variable
+ - simplify variable multiplication (e.g x^2 instead of xx)
+ - simplify constants (-2 instead of -2/1)
+
 Implement cancellation in conjunction with multiplication (a * 1/a = 1) --> test case: x^{3xy}
 
 Find gradient with respect to detected variables
