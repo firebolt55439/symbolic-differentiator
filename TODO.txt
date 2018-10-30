@@ -5,6 +5,11 @@ x^2ye^{\frac{y}{z}}
 -x-e^{2-3x}+e^{-2x}
 \sqrt{x^3+y^3}
 
+3 Bugs: \sin \left(x\right)^{x^{\frac{2}{-x}}}
+ - simplify -1 times variable
+ - simplify variable multiplication (e.g x^2 instead of xx)
+ - simplify constants (-2 instead of -2/1)
+
 Implement generic cancellation in fractions (e.g. (a1 * a2 * ... * an) / (b1 * b2 * ... * bn))
 Implement cancellation in conjunction with multiplication (a * 1/a = 1) --> test case: x^{3xy}
 
