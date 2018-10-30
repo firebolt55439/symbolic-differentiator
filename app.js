@@ -204,6 +204,59 @@ $(function() {
 		// Return result
 		return latex;
 	};
+	var scheme2latex = function(output_raw){
+		var output = '';
+		if(output_raw[0] == "(" && output_raw[output_raw.length - 1] == ")"){
+			output_raw = output_raw.slice(1, -1);
+		}
+		var passed_exp = false;
+		output_raw = output_raw.replaceAll("-1 '* ", "-");
+		for(var i = 0; i < output_raw.length; i++){
+			var on = output_raw[i];
+			var next = "";
+			var j = i + 1;
+			while(j < output_raw.length && output_raw[j] === " ") ++j;
+			if(output_raw[j] !== " ") next = output_raw[j];
+			if(on == "'") continue;
+			if(on == "*"){
+				// output += "\\ ";
+				if(next !== "("){
+					continue;
+				}
+			}
+			if(on == "^"){
+				passed_exp = true;
+			}
+			if(on == "("){
+				on = "\\left(";
+				if(passed_exp){
+					passed_exp = false;
+					on = "\{" + on;
+					var j = i;
+					var counter = 1;
+					while(++j < output_raw.length){
+						var at = output_raw[j];
+						if(!counter) break;
+						if(at == "(") ++counter;
+						else if(at == ")") --counter;
+					}
+					output_raw = output_raw.slice(0, j) + "\}" + output_raw.slice(j);
+				}
+			} else if(on ==")"){
+				on = "\\right)";
+			}
+			if(on != " " && on != "^"){
+				passed_exp = false;
+			}
+			output += on;
+		}
+		for(var func of IMPLEMENTED_FUNCTIONS.split(" ")){
+			var regex = new RegExp("(( )|^)(" + func + ")( )", "gm");
+			var replacement = "\\" + func;
+			output = output.replace(regex, replacement);
+		}
+		return output;
+	};
 
 	// Initialize output box
 	// var problemSpan = document.getElementById('problem');
@@ -234,7 +287,11 @@ $(function() {
 
 		// Generate w.r.t. preamble and postamble
 		var wrtVar = wrt || wrtMathField.latex();
-		var wrtArr = wrtVar.split(",").filter(x => x.length > 0);
+		var wrtArr = wrtVar
+			.split(",")
+			.filter(x => x.length > 0)
+			.map(x => x.replaceAll("\\ ", ""))
+		;
 		if(wrt){
 			wrtDisplaySpan.latex(`f_{${wrtArr.join("")}}`);
 		}
@@ -268,13 +325,10 @@ $(function() {
 		console.log("LaTeX:", latex_eqn);
 		console.log("ASCII:", ascii_rep);
 
-		// Generate Scheme command
-		var scheme_cmd = generateSchemeCmd(ascii_rep, wrtArr);
-		console.log("Scheme:", scheme_cmd);
-
 		// Perform Scheme evaluation
+		var scheme_cmd = generateSchemeCmd(ascii_rep, wrtArr);
 		biwa.evaluate(scheme_cmd, function(result) {
-			// Javascript-ize Scheme output
+			// Update DOM accordingly
 		  	showSuccessColors();
 		  	var output_res = result.to_array();
 	  	  	if(wrtNum == 1){
@@ -283,62 +337,15 @@ $(function() {
 	  				detected_vars = detected_vars.to_set().arr;
 	  				detected_vars = detected_vars.map(x => x.name).filter(x => !CONSTANT_VAR_NAMES.includes(x));
 	  				lastDetectedVarNum = detected_vars.length;
-	  				lastFuncString = `f(${detected_vars.join(", ")})`;
+	  				lastFuncString = `f(${detected_vars.join(",\\ ")})`;
 	  			}
 	  		}
 		  	detectedVarsSpan.latex(`${lastFuncString} = ${latex_eqn}`);
+
+		  	// Javascript-ize Scheme output
 		  	var output_raw = output_res[0].toString();
 		  	console.log("Raw output:", output_raw);
-		  	var output = '';
-		  	if(output_raw[0] == "(" && output_raw[output_raw.length - 1] == ")"){
-		  		output_raw = output_raw.slice(1, -1);
-		  	}
-		  	var passed_exp = false;
-		  	output_raw = output_raw.replaceAll("-1 '* ", "-");
-		  	for(var i = 0; i < output_raw.length; i++){
-		  		var on = output_raw[i];
-		  		var next = "";
-		  		var j = i + 1;
-		  		while(j < output_raw.length && output_raw[j] === " ") ++j;
-		  		if(output_raw[j] !== " ") next = output_raw[j];
-		  		if(on == "'") continue;
-		  		if(on == "*"){
-		  			// output += "\\ ";
-		  			if(next !== "("){
-		  				continue;
-		  			}
-		  		}
-		  		if(on == "^"){
-		  			passed_exp = true;
-		  		}
-		  		if(on == "("){
-		  			on = "\\left(";
-		  			if(passed_exp){
-		  				passed_exp = false;
-		  				on = "\{" + on;
-		  				var j = i;
-		  				var counter = 1;
-		  				while(++j < output_raw.length){
-		  					var at = output_raw[j];
-		  					if(!counter) break;
-		  					if(at == "(") ++counter;
-		  					else if(at == ")") --counter;
-		  				}
-		  				output_raw = output_raw.slice(0, j) + "\}" + output_raw.slice(j);
-		  			}
-		  		} else if(on ==")"){
-		  			on = "\\right)";
-		  		}
-		  		if(on != " " && on != "^"){
-		  			passed_exp = false;
-		  		}
-		  		output += on;
-		  	}
-		  	for(var func of IMPLEMENTED_FUNCTIONS.split(" ")){
-		  		var regex = new RegExp("(( )|^)(" + func + ")( )", "gm");
-		  		var replacement = "\\" + func;
-		  		output = output.replace(regex, replacement);
-		  	}
+		  	var output = scheme2latex(output_raw);
 		  	console.log("Processed:", output);
 
 		  	// Generate LaTeX display
