@@ -67,6 +67,16 @@ $(function() {
 		// 	preview: "none",
 		// 	inlineMath: [["$","$"],["\\(","\\)"]]
 		// },
+		displayAlign: "left",
+		CommonHTML: {
+			scale: 100,
+			linebreaks: {
+				width: "90% body",
+				automatic: true
+			}
+		},
+		"HTML-CSS": { linebreaks: { automatic: true } },
+		SVG: { linebreaks: { automatic: true } },
 		messageStyle: "none"
 	});
 
@@ -350,11 +360,11 @@ $(function() {
 
 		  	// Generate LaTeX display
 		  	latex_eqn = latex_eqn.replaceAll("operatorname", "text");
-		  	var preamble = `\\frac{\\partial${(wrtNum > 1 ? `^{${wrtNum}}` : "")}}{${wrtVar}}\\left(`;
+		  	var preamble = `{:(\\frac{\\partial${(wrtNum > 1 ? `^{${wrtNum}}` : "")}}{${wrtVar}}\\left(`;
 		  	if(lastDetectedVarNum == 1){
 		  		preamble = preamble.replaceAll("\\partial", "d");
 		  	}
-		  	var postamble = `\\right) = ${output}`;
+		  	var postamble = `\\right) =,${output}):}`;
 		  	var latex_str = preamble + lastFuncString.replaceAll('\\ ', '') + postamble;
 		  	var tock_id = tockers[tock];
 		  	$(tock_id).css('display', 'none');

@@ -35,8 +35,10 @@ body {
 	font-size: 0.9em;
 }
 
-.mathjax-output {
-	font-size: 0.8em;
+.mjx-mtd {
+	padding: 0px 0px 0px 0px !important;
+	align-items: left !important;
+	text-align: left !important;
 }
 
 /* .hljs-builtin-normal { color: #e6db74; }
