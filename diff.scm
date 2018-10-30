@@ -52,6 +52,7 @@
 
 ; Products are represented as lists that start with *.
 (define (make-product m1 m2)
+  ; (console-log "Product called on" m1 m2)
   (cond ((or (=number? m1 0) (=number? m2 0)) 0) ; x * 0 = x
         ((=number? m1 1) m2) ; 1 * x = x
         ((=number? m2 1) m1) ; x * 1 = x
@@ -116,7 +117,13 @@
         ((and (or (number? m1) (symbol? m1)) (division? m2)) ; a * (b/c) = (ab)/c
           (make-div (make-product m1 (numerator m2)) (denominator m2))
         )
-        ((and (symbol? m2) (division? m1)) ; (b/c) * a = (ba)/c
+        ((and (division? m1) (=number? (numerator m1) 1) (not (division? m2)))
+          (make-div m2 (denominator m1))
+        )
+        ((and (division? m2) (=number? (numerator m2) 1) (not (division? m1)))
+          (make-product m2 m1)
+        )
+        ((and (symbol? m2) (division? m1)) ; bring symbols in front of fractions
           (make-product m2 m1)
         )
         (else (list '* m1 m2))))
@@ -240,7 +247,8 @@
 
 ; Extension: division
 (define (make-div m1 m2)
-  (cond ((and (=number? m1 0) (=number? m2 0)) (error '0/0))
+  ; (console-log "Div called on" m1 m2)
+  (cond ((and (=number? m1 0) (=number? m2 0)) (error "0/0"))
         ((=number? m1 0) 0)
         ((=number? m2 0) (error "Division by zero"))
         ((equal? m1 m2) 1) ; x / x = 1
@@ -252,9 +260,9 @@
             (make-div 1 (make-exp (base m2) (make-subtraction (exponent m2) 1)))
           )
         )
-        ((and (product? m1) (number? (multiplier m1))) ; simplify (kx)/y = k*(x/y)
-          (make-product (multiplier m1) (make-div (multiplicand m1) m2))
-        )
+        ; ((and (product? m1) (number? (multiplier m1))) ; simplify (kx)/y = k*(x/y) ; leads to mutual recursion with make-product in case of \sqrt{x^3}
+        ;   (make-product (multiplier m1) (make-div (multiplicand m1) m2))
+        ; )
         ((and (exp? m2) (number? (exponent m2)) (< (exponent m2) 0)) ; simplify negative exponents of form x/y^(-2) = xy^2
           (make-product m1 (make-exp (base m2) (- (exponent m2))))
         )
@@ -289,7 +297,7 @@
           )
         )
         ((=number? m2 1) m1)
-        ((and (number? m1) (number? m2)) (/ m1 m2))
+        ((and (number? m1) (number? m2) (= 0 (mod m1 m2))) (/ m1 m2))
         (else (list '/ m1 m2))))
 (define (numerator expr) (cadr expr))
 (define (denominator expr) (caddr expr))
@@ -569,7 +577,10 @@
             (and
               (= (cadr left) cur_precedence)
               (not (eq? (cadr (cdr left)) (car expr))) ; put parenthesis if operators don't match up
-              (not (contains safe-operators (caddr left))) ; and not "safe" operators (e.g. * and + is safe)
+              (or
+                (not (contains safe-operators (caddr left))) ; and either not "safe" operators (e.g. * and + is safe)
+                (not (contains safe-operators (car expr))) ; or current operator is not safe
+              )
             )
           )
           (define ret (append ret (list (car left))))
@@ -582,7 +593,10 @@
             (and
               (= (cadr right) cur_precedence) ; if same precedence, then
               (not (eq? (cadr (cdr right)) (car expr))) ; put parenthesis if operators don't match up
-              (not (contains safe-operators (caddr right))) ; and not "safe" operators (e.g. * and + is safe)
+              (or
+                (not (contains safe-operators (caddr right))) ; and either not "safe" operators (e.g. * and + is safe)
+                (not (contains safe-operators (car expr))) ; or current operator is not safe
+              )
             )
             (and
               (exp? expr) ; special handling for exponentials

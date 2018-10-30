@@ -190,6 +190,7 @@ $(function() {
 	const IMPLEMENTED_FUNCTIONS = 'sin cos tan sinh cosh tanh log ln sqrt';
 	const CONSTANT_VAR_NAMES = ["i", "e"] + GREEK_LETTERS.split(' ');
 	var lastFuncString = "f(x)";
+	var lastLatexEqn = "x";
 	var handleOutputChange = function(wrt) {
 		// Modify DOM element
 		hideError();
@@ -223,7 +224,7 @@ $(function() {
 		})(); // avoid polluting function namespace
 
 		// Parse and process LaTeX input
-		var latex_eqn = answerMathField.latex();
+		var latex_eqn = lastLatexEqn;
 		latex_eqn = stripLatexSpaces(latex_eqn);
 		var ascii_rep = latex2ascii(latex_eqn);
 		console.log("LaTeX:", latex_eqn);
@@ -240,9 +241,11 @@ $(function() {
 		  	var output_res = result.to_array();
 	  	  	if(wrtNum == 1){
 	  			var detected_vars = output_res[1];
-	  			detected_vars = detected_vars.to_set().arr;
-	  			detected_vars = detected_vars.map(x => x.name).filter(x => !CONSTANT_VAR_NAMES.includes(x));
-	  			lastFuncString = `f(${detected_vars.join(", ")})`;
+	  			if(detected_vars.to_set){
+	  				detected_vars = detected_vars.to_set().arr;
+	  				detected_vars = detected_vars.map(x => x.name).filter(x => !CONSTANT_VAR_NAMES.includes(x));
+	  				lastFuncString = `f(${detected_vars.join(", ")})`;
+	  			}
 	  		}
 		  	detectedVarsSpan.latex(`${lastFuncString} = ${latex_eqn}`);
 		  	var output_raw = output_res[0].toString();
@@ -320,14 +323,36 @@ $(function() {
 		});
 	};
 
-	// Initialize input box for equation
+	// Initialize input box for expressions
 	var answerSpan = document.getElementById('answer');
 	var answerMathField = MQ.MathField(answerSpan, {
 		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
-		autoCommands: GREEK_LETTERS + 'sqrt',
+		autoCommands: GREEK_LETTERS + ' sqrt',
 		handlers: {
 			edit: function() {
-				var enteredMath = answerMathField.latex(); // Get entered math in LaTeX format
+				lastLatexEqn = answerMathField.latex(); // Get entered math in LaTeX format
+				setTimeout(handleOutputChange, 50);
+			}
+		}
+	});
+
+	// Initialize input boxes for relations
+	var answerLeftField = MQ.MathField(document.getElementById('answer_lhs'), {
+		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
+		autoCommands: GREEK_LETTERS + ' sqrt',
+		handlers: {
+			edit: function() {
+				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
+				setTimeout(handleOutputChange, 50);
+			}
+		}
+	});
+	var answerRightField = MQ.MathField(document.getElementById('answer_rhs'), {
+		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
+		autoCommands: GREEK_LETTERS + ' sqrt',
+		handlers: {
+			edit: function() {
+				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
 				setTimeout(handleOutputChange, 50);
 			}
 		}
