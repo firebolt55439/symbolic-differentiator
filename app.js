@@ -12,15 +12,25 @@ $(function() {
 		$('#error_message').text(err);
 		$('#error_box').show();
 	};
+	var allBoxes = ['answer', 'answer_lhs', 'answer_rhs'];
+	allBoxes.map(x => $('#' + x).addClass('init-outline'));
+	var lastBoxTyping = [];
 	var hideError = function() {
 		$('#error_box').hide();
-		$('#answer').removeClass('syntax-outline').removeClass('success-outline');
+		for(var box of allBoxes){
+			$('#' + box).removeClass('syntax-outline').removeClass('success-outline')
+			;
+		}
 	};
 	var showSuccessColors = function() {
-		$('#answer').removeClass('syntax-outline').addClass('success-outline');
+		for(var box of lastBoxTyping){
+			$('#' + box).removeClass('syntax-outline').addClass('success-outline');
+		}
 	};
 	var showFailureColors = function() {
-		$('#answer').addClass('syntax-outline').removeClass('success-outline');
+		for(var box of lastBoxTyping){
+			$('#' + box).addClass('syntax-outline').removeClass('success-outline');
+		}
 	};
 	var refreshCode = function() {
 		$('#debug_area').show();
@@ -390,6 +400,7 @@ $(function() {
 		autoCommands: GREEK_LETTERS + ' sqrt',
 		handlers: {
 			edit: function() {
+				lastBoxTyping = ['answer'];
 				lastLatexEqn = answerMathField.latex(); // Get entered math in LaTeX format
 				setTimeout(handleOutputChange, 50);
 			}
@@ -402,6 +413,7 @@ $(function() {
 		autoCommands: GREEK_LETTERS + ' sqrt',
 		handlers: {
 			edit: function() {
+				lastBoxTyping = ['answer_lhs', 'answer_rhs'];
 				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
 				setTimeout(handleOutputChange, 50);
 			}
@@ -412,6 +424,7 @@ $(function() {
 		autoCommands: GREEK_LETTERS + ' sqrt',
 		handlers: {
 			edit: function() {
+				lastBoxTyping = ['answer_lhs', 'answer_rhs'];
 				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
 				setTimeout(handleOutputChange, 50);
 			}
@@ -424,6 +437,7 @@ $(function() {
 		autoCommands: GREEK_LETTERS,
 		handlers: {
 			edit: function() {
+				lastBoxTyping = ['answer'];
 				setTimeout(handleOutputChange, 50);
 			}
 		}
@@ -435,6 +449,7 @@ $(function() {
 		handlers: {
 			edit: function() {
 				setTimeout(() => {
+					lastBoxTyping = ['answer'];
 					handleOutputChange(wrtArrMathField.latex());
 				}, 50);
 			}
@@ -443,6 +458,7 @@ $(function() {
 	var orderNumMathField = MQ.MathField(document.getElementById('order_num'), {
 		handlers: {
 			edit: function() {
+				lastBoxTyping = ['answer'];
 				setTimeout(handleOutputChange, 50);
 			}
 		}
