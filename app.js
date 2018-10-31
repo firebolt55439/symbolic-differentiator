@@ -127,7 +127,7 @@ $(function() {
 				var j = i + 1;
 				while(j < latex.length && latex[j] == " ") ++j;
 				next_non_space = latex[j];
-				if(latex[j] == " "){
+				if(!next_non_space || next_non_space === " "){
 					next_non_space = "";
 				}
 			}
@@ -166,7 +166,7 @@ $(function() {
 						var j = i + 1;
 						while(j < latex.length && latex[j] == " ") ++j;
 						next_non_space = latex[j];
-						if(latex[j] == " "){
+						if(!next_non_space || next_non_space === " "){
 							next_non_space = "";
 						}
 					}
@@ -183,7 +183,7 @@ $(function() {
 				on = ")";
 			}
 			out_str += on;
-			if(on == ")" && (isLetter(next_non_space) || isNumber(next_non_space))){
+			if(on == ")" && (isLetter(next_non_space) || isNumber(next_non_space) || next_non_space === "\\")){
 				out_str += " * ";
 			}
 			if(adding_slash){

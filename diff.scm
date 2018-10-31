@@ -45,7 +45,7 @@
           (make-sum a2 a1)
         )
         ((and (product? a2) (number? (multiplier a2)) (< (multiplier a2) 0)) ; a + (-bc) = a - bc
-          (make-subtraction a1 (make-product (* -1 (multiplier a2)) (multiplicand a2)))
+          (make-subtraction a1 (make-product -1 a2))
         )
         (else (list '+ a1 a2))))
 (define (sum? x)
@@ -170,8 +170,8 @@
             (multiplicand m2)
           )
         )
-        ((can-power-fold m1 m2) (fold-power m1 m2))
-        ((can-power-fold m2 m1) (fold-power m2 m1))
+        ((can-power-fold m1 m2) (fold-power m1 m2)) ; general power folding with right
+        ((can-power-fold m2 m1) (fold-power m2 m1)) ; general power folding with left
         ((and (number? m2) (product? m1) (or (number? (multiplier m1)) (number? (multiplicand m1)))) ; a(kx) = (ak)x
           (if (number? (multiplier m1))
             (make-product (* m2 (multiplier m1)) (multiplicand m1))
@@ -202,7 +202,7 @@
         ((and (product? m1) (product? m2) (symbol? (multiplier m1))) ; assist in power folding
           (make-product
             (make-product (multiplier m1) m2)
-            (multiplicand m2)
+            (multiplicand m1)
           )
         )
         ((and (product? m1) (product? m2) (symbol? (multiplier m2))) ; reverse of above rule
@@ -235,6 +235,12 @@
           (make-product (multiplier m1) (make-product m2 (multiplicand m1)))
         )
         ((and (exp? m1) (symbol? m2)) ; bring variable coefficients in front of exponentials
+          (make-product m2 m1)
+        )
+        ((and (symbol? m2) (sum? m1)) ; (a+b)x = x(a+b)
+          (make-product m2 m1)
+        )
+        ((and (product? m2) (exp? m1)) ; bring products in front of exponents
           (make-product m2 m1)
         )
         (else (list '* m1 m2))))
@@ -343,17 +349,8 @@
             (make-sum a1 (multiplier a2))
           )
         )
-        ((and (product? a1) (or (=number? (multiplier a1) -1) (=number? (multiplicand a1) -1)))
-          (make-product
-            -1
-            (if (=number? (multiplier a1) -1)
-              (make-sum a2 (multiplicand a1))
-              (make-sum a2 (multiplier a1))
-            )
-          )
-        )
         ((and (product? a2) (number? (multiplier a2)) (< (multiplier a2) 0)) ; a - (-bc) = a + b
-          (make-sum a1 (make-product (* -1 (multiplier a2)) (multiplicand a2)))
+          (make-sum a1 (make-product -1 a2))
         )
         (else (list '- a1 a2))))
 (define (subtraction? x)
@@ -423,17 +420,14 @@
 (define (denominator expr) (caddr expr))
 (define (derive-div expr var)
   (make-div
-    (make-sum
+    (make-subtraction
       (make-product
         (derive (numerator expr) var)
         (denominator expr)
       )
       (make-product
-        -1
-        (make-product
-          (numerator expr)
-          (derive (denominator expr) var)
-        )
+        (numerator expr)
+        (derive (denominator expr) var)
       )
     )
     (make-exp (denominator expr) 2)
