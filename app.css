@@ -5,7 +5,16 @@ body {
 	background-attachment: fixed;
 	/* margin: 0; */
 	font: 1.5em/1.2 Symbola, serif;
+}
 
+#main_nav {
+	background: #b5bdc2;  /* fallback for old browsers */
+	background: linear-gradient(to right, #ebecef, #b5bdc2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	background-attachment: fixed;
+}
+
+h1.main-lead {
+	font-weight: bold;
 }
 
 #wrt_disp, #detected_vars {
@@ -46,6 +55,16 @@ body {
 	padding: 0px 0px 0px 0px !important;
 	align-items: left !important;
 	text-align: left !important;
+}
+
+.navbar-brand {
+	font-weight: 300;
+}
+
+h4 {
+	font-size: 1.5em;
+	font-weight: bold;
+	margin-bottom: 0.8em;
 }
 
 /* .hljs-builtin-normal { color: #e6db74; }

@@ -85,7 +85,7 @@ $(function() {
 		CommonHTML: {
 			scale: 100,
 			linebreaks: {
-				width: "90% body",
+				width: "83%",
 				automatic: true
 			}
 		},

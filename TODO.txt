@@ -10,6 +10,7 @@ x^2ye^{\frac{y}{z}}
 xyxyyzyxyyzyxyzyxyzxyyzxy
 e^{\sin \left(\pi xyz\right)}\cdot \pi xyz\cdot \left(\pi +x+y\pi xy\pi z\right)
 
+Fix web interface f(x, y, z) display for implicitly defined relations
 Implement sidebar to switch between expression, relation and show gradient, mixed partial, etc. as well as samples
 Implement support for \sin ^2\left(x\right) notation
 	-> sin^2(x) notation needed

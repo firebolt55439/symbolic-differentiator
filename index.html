@@ -1,43 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<title>Symbolic Differentiator</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="/mathquill.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" integrity="sha384-pjaaA8dDz/5BgdFUPX6M/9SUZv4d12SUPF0axWc+VRZkx5xU3daN+lYb49+Ax+Tl" crossorigin="anonymous"></script>
 	<script src="/mathquill.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 	<script type="text/javascript" src="/biwascheme-0.6.8-min.js"></script>
 	<script type="text/javascript" src="/hljs-scheme.js"></script>
 	<script type="text/javascript" src="/app.js?v=0.0.1"></script>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="/app.css?v=0.0.1">
 	<link rel="stylesheet" type="text/css" href="/monokai-sublime.css">
 </head>
 <body>
-
-
-<h4>Output:</h4>
-<div>
-	<span class="mathquill-disp" id="detected_vars">f(x) = x</span><br /><br />
-	<span class="mathjax-output" id="problem">`{:(\frac{d}{dx} (f(x)) =, 1):}`</span>
-	<span class="mathjax-output" id="problem2" style="display: none;"></span>
+<div class="jumbotron text-center">
+    <h1 class="main-lead display-4">Welcome to `d/dx` it!</h1><br/>
+    <p class="lead">The fastest, most complete Scheme symbolic differentiator you've ever seen.</p>
+    <hr class="my-4">
+	<p>Take extremely complicated partial derivatives with ease!</p>
+	<a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+	<a class="btn btn-primary btn-lg" href="#" role="button">Supported Functions</a>
+	<a class="btn btn-primary btn-lg" href="#" role="button">Horrific Samples</a>
 </div>
 
-<p style="color: orange; display: none;" id="error_box">Error: <span id="error_message"></span></p>
-<h4>Differentiate:</h4>
-<p>Expression: <span class="math-field" id="answer">x</span></p>
-<p>Relation: <span class="math-field" id="answer_lhs">x^2 + y^2 + z^2</span>`=`<span class="math-field" id="answer_rhs">e^{xyz}</span> solving for `\partial`<span id="answer_fn">z</span></p>
-<p>With respect to: <span id="wrt">x</span></p>
-<p>Solve for:</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mixed partial derivative with respect to <span id="wrt_arr">x,\ y</span> (computes <span id="wrt_disp" contenteditable="false">f_{xy}</span>) from left to right</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All mixed partial derivatives of order <span id="order_num">2</span> with respect to variables specified above</p>
-
-<div id="debug_area" style="display: none;">
-	<p>Input Infix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
-	<p>Parsed Infix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
-	<p>Constant Folding: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
-	<p>Derivative as Prefix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
-	<p>Derivative as Infix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col">
+			<h4>Output:</h4>
+			<div style="width: 60vw !important;">
+				<span class="mathquill-disp" id="detected_vars">f(x) = x</span><br /><br />
+				<span class="mathjax-output" id="problem">`{:(\frac{d}{dx} (f(x)) =, 1):}`</span>
+				<span class="mathjax-output" id="problem2" style="display: none;"></span>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<p style="color: orange; display: none;" id="error_box">Error: <span id="error_message"></span></p>
+	</div><br style="line-height: 1.4em;" />
+	<div class="row">
+		<div class="col">
+			<h4>Differentiate:</h4>
+			<p>Expression: <span class="math-field" id="answer">x</span></p>
+			<p>Relation: <span class="math-field" id="answer_lhs">x^2 + y^2 + z^2</span>`=`<span class="math-field" id="answer_rhs">e^{xyz}</span> solving for `\partial`<span id="answer_fn">z</span></p>
+			<p>With respect to: <span id="wrt">x</span></p>
+			<p>Solve for:</p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mixed partial derivative with respect to <span id="wrt_arr">x,\ y</span> (computes <span id="wrt_disp" contenteditable="false">f_{xy}</span>) from left to right</p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All mixed partial derivatives of order <span id="order_num">2</span> with respect to variables specified above</p>
+		</div>
+	</div>
+	<br />
+	<div class="row">
+		<div class="col">
+			<div id="debug_area" style="display: none;">
+				<p>Input Infix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
+				<p>Parsed Infix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
+				<p>Constant Folding: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
+				<p>Derivative as Prefix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
+				<p>Derivative as Infix: <br /><code class="scheme debug_outputs" readonly="true"></code></p>
+			</div>
+		</div>
+	</div>
 </div>
 
 </body>
