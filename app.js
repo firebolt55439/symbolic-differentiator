@@ -249,6 +249,11 @@ $(function() {
 				&& (isLetter(on) || (isNumber(on) && !isNumber(next_non_space)))){
 				out_str += " * ";
 			}
+			if((isLetter(on) || isNumber(on)) &&
+				operators.indexOf(next_non_space) === -1 &&
+				next_non_space === "("){
+				out_str += " * ";
+			}
 			if(on === "-" && (prev === "" || prev === "\{" || prev === "(")){
 				out_str = out_str.slice(0, -1);
 				out_str += "1 * ";

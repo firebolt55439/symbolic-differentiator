@@ -688,7 +688,13 @@
         ((product? expr) (make-product (alg-simplify (multiplier expr)) (alg-simplify (multiplicand expr))))
         ((exp? expr) (make-exp (alg-simplify (base expr)) (alg-simplify (exponent expr))))
         ((division? expr) (make-div (alg-simplify (numerator expr)) (alg-simplify (denominator expr))))
-        ((function? expr) (list (car expr) (alg-simplify (cadr expr))))
+        ((function? expr)
+          (cond
+            ((or (eq? 'log (car expr)) (eq? 'ln (car expr))) (make-ln (alg-simplify (cadr expr))))
+            ((eq? 'sqrt (car expr)) (make-sqrt (alg-simplify (cadr expr))))
+            (else (list (car expr) (alg-simplify (cadr expr))))
+          )
+        )
         (else (error "Unknown type for simplification" (car expr)))))
 
 ; Extension: derivative with infix input and output
