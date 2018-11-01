@@ -1,3 +1,5 @@
+/* Code written by Sumer Kohli - sumer.kohli@berkeley.edu */
+
 hljs.initHighlightingOnLoad();
 
 String.prototype.replaceAll = function(search, replacement) {
