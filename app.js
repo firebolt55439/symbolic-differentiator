@@ -49,6 +49,10 @@ $(function() {
 		console.warn(ar);
 		displayError(ar[0]);
 	});
+	BiwaScheme.define_libfunc("error", 1, 1, function(ar){
+		console.error(ar);
+		displayError(ar[0]);
+	});
 	BiwaScheme.define_libfunc("pass-message", 2, 3, function(ar){
 		if(ar[0].toString().length > 0){
 			console.log(ar[0], ar[1].toString());
@@ -119,6 +123,10 @@ $(function() {
 	};
 	var latex2ascii = function(latex) {
 		// Do broad replace-rules.
+		if(latex.includes("=")){
+			var arr = latex.split("=");
+			return latex2ascii(arr[0]) + " = " + latex2ascii(arr[1]);
+		}
 		latex = latex.slice(0);
 		latex = latex.replaceAll("^{ }", "");
 		latex = latex.replaceAll("\\cdot", " * ");
@@ -286,11 +294,17 @@ $(function() {
 	var generateSchemeCmd = function(ascii_rep, wrt_arr) {
 		var ret = `'(${ascii_rep})`;
 		var had_one = false;
+		var fn_var = '';
+		if(ret.includes(" = ")){
+			fn_var = `'${fnWrtDisplaySpan.latex()}`;
+		} else {
+			fn_var = 'nil';
+		}
 		while(wrt_arr.length > 0){
 			if(had_one){
 				ret = `(car ${ret})`;
 			}
-			ret = `(derive-infix ${ret} '${wrt_arr.shift()})`;
+			ret = `(derive-infix ${ret} '${wrt_arr.shift()} ${fn_var})`;
 			had_one = true;
 		}
 		return ret;
@@ -313,6 +327,7 @@ $(function() {
 			.map(x => x.replaceAll("\\ ", ""))
 		;
 		if(wrt){
+			lastLatexEqn = answerMathField.latex(); // can't handle higher-order derivatives of implicitly defined relations yett
 			wrtDisplaySpan.latex(`f_{${wrtArr.join("")}}`);
 		}
 		wrtArr = wrtArr.map(x => x.replaceAll('\\', ''));
@@ -463,9 +478,19 @@ $(function() {
 			}
 		}
 	});
+	var fnWrtDisplaySpan = MQ.MathField(document.getElementById('answer_fn'), {
+		autoCommands: GREEK_LETTERS,
+		handlers: {
+			edit: function() {
+				lastBoxTyping = ['answer_lhs', 'answer_rhs'];
+				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
+				setTimeout(handleOutputChange, 50);
+			}
+		}
+	});
 
 	// Initialize output fields
 	var detectedVarsSpan = MQ.MathField(document.getElementById('detected_vars'), {});
-	showSuccessColors();
 	var wrtDisplaySpan = MQ.MathField(document.getElementById('wrt_disp'), {});
+	showSuccessColors();
 });

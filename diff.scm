@@ -1,7 +1,6 @@
 (define nil '())
 (define (cadr s) (car (cdr s)))
 (define (caddr s) (cadr (cdr s)))
-(define (error str) (console-error str))
 
 ; derive returns the derivative of EXPR with respect to VAR
 (define (derive expr var)
@@ -438,8 +437,8 @@
 )
 
 ; Extension: infix to postfix + prefix
-(define operators '(+ - * / ^))
-(define op_precedence '(1 1 2 2 3))
+(define operators '(+ - * / ^ =))
+(define op_precedence '(1 1 2 2 3 0))
 (define functions '(sin cos tan sinh cosh tanh log ln sqrt abs))
 (define seen-variables (list))
 (define (contains lst x)
@@ -736,15 +735,28 @@
     )
   )
 )
-(define (derive-infix expr var)
+(define (derive-infix expr var imp-var)
   (set! seen-variables (list))
   (pass-message "Scheme:" expr "infix-input")
   (define parsed-infix (parse-infix expr))
+  (if (and (not (null? parsed-infix)) (list? parsed-infix) (eq? '= (car parsed-infix)))
+    (begin
+      (set! parsed-infix (make-subtraction (cadr parsed-infix) (caddr parsed-infix)))
+    )
+    (set! imp-var nil)
+  )
   (pass-message "Parsed Infix:" parsed-infix "parsed-infix")
   (define simplified-infix (alg-simplify parsed-infix))
   (pass-message "Simplified Infix:" simplified-infix "simplified-infix")
   (define derivative (derive simplified-infix var))
   (pass-message "Derivative:" derivative "derivative-prefix")
+  (if (not (null? imp-var))
+    (begin
+      (define bottom-derivative (derive simplified-infix imp-var))
+      (pass-message "Bottom Derivative:" bottom-derivative "bottom-derivative-prefix")
+      (set! derivative (make-product -1 (make-div derivative bottom-derivative)))
+    )
+  )
   (define ret (prefix-to-infix derivative))
   (if (not (list? ret))
     (derivative-dne "Could not take derivative")
