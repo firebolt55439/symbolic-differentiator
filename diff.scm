@@ -691,7 +691,7 @@
         ((function? expr)
           (cond
             ((or (eq? 'log (car expr)) (eq? 'ln (car expr))) (make-ln (alg-simplify (cadr expr))))
-            ((eq? 'sqrt (car expr)) (make-sqrt (alg-simplify (cadr expr))))
+            ; ((eq? 'sqrt (car expr)) (make-sqrt (alg-simplify (cadr expr)))) ; may result in over-eager abs() simplification
             (else (list (car expr) (alg-simplify (cadr expr))))
           )
         )

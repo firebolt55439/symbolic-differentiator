@@ -41,10 +41,10 @@ $(function() {
 		$('#error_box').show();
 		refreshCode();
 	};
-	var showedFirst = false;
+	var ignoreColors = 0;
 	var showSuccessColors = function() {
-		if(!showedFirst){
-			showedFirst = true;
+		if(ignoreColors > 0){
+			--ignoreColors;
 			return;
 		}
 		for(var box of lastBoxTyping){
@@ -532,9 +532,18 @@ $(function() {
 	});
 
 	// Initialize output fields
+	const SAMPLE_EXPRESSIONS = [
+		"\\sqrt{x^3+y^3}",
+		"\\sin (x^2+y^2)+y^x+\\sqrt{x^2}"
+	];
+	var getRandomElement = function(items) {
+		return items[Math.floor(Math.random()*items.length)];;
+	};
 	var detectedVarsSpan = MQ.MathField(document.getElementById('detected_vars'), {});
 	var wrtDisplaySpan = MQ.MathField(document.getElementById('wrt_disp'), {});
 	setTimeout(() => {
-		answerMathField.config().__options.handlers.fns.edit();
+		// answerMathField.config().__options.handlers.fns.edit();
+		ignoreColors = 2;
+		answerMathField.latex(getRandomElement(SAMPLE_EXPRESSIONS));
 	}, 100);
 });
