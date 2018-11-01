@@ -289,6 +289,15 @@
         (make-product -1 (make-exp (multiplicand base) exponent))
       )
     )
+    ((and (eq? base 'e) (function? exponent) (eq? 'ln (car exponent)))
+      (cadr exponent)
+    )
+    ((and (eq? base 'e) (product? exponent) (function? (multiplicand exponent)) (eq? 'ln (car (multiplicand exponent))))
+      (make-exp
+        (cadr (multiplicand exponent))
+        (multiplier exponent)
+      )
+    )
     (else (list '^ base exponent)))
 )
 
@@ -361,7 +370,7 @@
 ; Extension: division
 (define (make-div m1 m2)
   ; (console-log "Div called on" m1 m2)
-  (cond ((and (=number? m1 0) (=number? m2 0)) (error "0/0"))
+  (cond ((and (=number? m1 0) (=number? m2 0)) (error "Division by zero"))
         ((=number? m1 0) 0)
         ((=number? m2 0) (error "Division by zero"))
         ((equal? m1 m2) 1) ; x / x = 1
@@ -439,7 +448,7 @@
 ; Extension: infix to postfix + prefix
 (define operators '(+ - * / ^ =))
 (define op_precedence '(1 1 2 2 3 0))
-(define functions '(sin cos tan sinh cosh tanh log ln sqrt abs))
+(define functions '(sin cos tan sinh cosh tanh log ln sqrt abs arcsin arccos arctan))
 (define seen-variables (list))
 (define (contains lst x)
   (cond
@@ -653,7 +662,16 @@
     ((eq? func 'abs)
       (derivative-dne "Derivative of absolute value does not exist")
     )
-    (else (error "Unknown function derivative"))
+    ((eq? func 'arcsin)
+      (lambda (x) (make-div 1 (make-sqrt (make-subtraction 1 (make-exp x 2)))))
+    )
+    ((eq? func 'arccos)
+      (lambda (x) (make-div -1 (make-sqrt (make-subtraction 1 (make-exp x 2)))))
+    )
+    ((eq? func 'arctan)
+      (lambda (x) (make-div 1 (make-sum 1 (make-exp x 2))))
+    )
+    (else (error "Don't know how to take derivative of" func))
   ))
   (make-product
     (derivative-func (cadr expr))
@@ -671,7 +689,7 @@
         ((exp? expr) (make-exp (alg-simplify (base expr)) (alg-simplify (exponent expr))))
         ((division? expr) (make-div (alg-simplify (numerator expr)) (alg-simplify (denominator expr))))
         ((function? expr) (list (car expr) (alg-simplify (cadr expr))))
-        (else (error "Unknown type for simplification"))))
+        (else (error "Unknown type for simplification" (car expr)))))
 
 ; Extension: derivative with infix input and output
 (define (leq? a b) (not (< b a)))

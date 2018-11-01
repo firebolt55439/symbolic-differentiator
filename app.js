@@ -9,20 +9,37 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 $(function() {
-	// Instantiate interpreter
-	var displayError = function(err) {
-		$('#error_message').text(err);
-		$('#error_box').show();
-	};
+	// Define DOM helper functions for status updates and the like
 	var allBoxes = ['answer', 'answer_lhs', 'answer_rhs'];
 	allBoxes.map(x => $('#' + x).addClass('init-outline'));
 	var lastBoxTyping = [];
+	var prepCodeArea = function() {
+		$('code.scheme').each(function(i, block){
+			$(block).html("");
+		});
+	};
+	var refreshCode = function() {
+		$('#debug_area').show();
+		$('code.scheme').each(function(i, block){
+			if($(block).text().length == 0){
+				$(block).parent().hide();
+			} else {
+				$(block).parent().show();
+				hljs.highlightBlock(block);
+			}
+		});
+	};
 	var hideError = function() {
 		$('#error_box').hide();
 		for(var box of allBoxes){
 			$('#' + box).removeClass('syntax-outline').removeClass('success-outline')
 			;
 		}
+	};
+	var displayError = function(err) {
+		$('#error_message').text(err);
+		$('#error_box').show();
+		refreshCode();
 	};
 	var showSuccessColors = function() {
 		for(var box of lastBoxTyping){
@@ -34,12 +51,6 @@ $(function() {
 			$('#' + box).addClass('syntax-outline').removeClass('success-outline');
 		}
 	};
-	var refreshCode = function() {
-		$('#debug_area').show();
-		$('code.scheme').each(function(i, block){
-			hljs.highlightBlock(block);
-		});
-	};
 	var handleMessage = function(type, data){
 		data = data.toString();
 		var idx = ["infix-input", "parsed-infix", "simplified-infix", "derivative-prefix", "derivative-infix"];
@@ -47,13 +58,25 @@ $(function() {
 			$($('.debug_outputs').get(idx.indexOf(type))).text(data);
 		}
 	};
+
+	// Instantiate interrpreter
 	BiwaScheme.define_libfunc("derivative-dne", 1, 1, function(ar){
 		console.warn(ar);
 		displayError(ar[0]);
 	});
-	BiwaScheme.define_libfunc("error", 1, 1, function(ar){
+	BiwaScheme.define_libfunc("error", 1, null, function(ar){
 		console.error(ar);
-		displayError(ar[0]);
+		var massageKlass = function(klass){
+			if(typeof klass === 'string' || klass instanceof String){
+				return klass;
+			}
+			if('name' in klass){
+				return klass.name;
+			}
+			return klass.toString();
+		};
+		var err_message = ar.map(x => massageKlass(x));
+		displayError(err_message.join(" "));
 	});
 	BiwaScheme.define_libfunc("pass-message", 2, 3, function(ar){
 		if(ar[0].toString().length > 0){
@@ -312,7 +335,7 @@ $(function() {
 		return ret;
 	};
 	const GREEK_LETTERS = 'pi theta alpha beta gamma';
-	const IMPLEMENTED_FUNCTIONS = 'sin cos tan sinh cosh tanh log ln sqrt abs';
+	const IMPLEMENTED_FUNCTIONS = 'sin cos tan sinh cosh tanh log ln sqrt abs arcsin arccos arctan';
 	const CONSTANT_VAR_NAMES = ["i", "e"] + GREEK_LETTERS.split(' ');
 	var lastFuncString = "f(x)";
 	var lastLatexEqn = "x";
@@ -320,6 +343,7 @@ $(function() {
 	var handleOutputChange = function(wrt) {
 		// Modify DOM element
 		hideError();
+		prepCodeArea();
 
 		// Generate w.r.t. preamble and postamble
 		var wrtVar = wrt || wrtMathField.latex();
@@ -364,6 +388,7 @@ $(function() {
 
 		// Perform Scheme evaluation
 		var scheme_cmd = generateSchemeCmd(ascii_rep, wrtArr);
+		var is_implicit = ascii_rep.includes(" = ");
 		biwa.evaluate(scheme_cmd, function(result) {
 			// Update DOM accordingly
 		  	showSuccessColors();
@@ -377,7 +402,12 @@ $(function() {
 	  				lastFuncString = `f(${detected_vars.join(",\\ ")})`;
 	  			}
 	  		}
-		  	detectedVarsSpan.latex(`${lastFuncString} = ${latex_eqn}`);
+	  		if(is_implicit){
+	  			detectedVarsSpan.latex(`${latex_eqn}`);
+	  			lastFuncString = fnWrtDisplaySpan.latex();
+	  		} else {
+	  			detectedVarsSpan.latex(`${lastFuncString} = ${latex_eqn}`);
+	  		}
 
 		  	// Javascript-ize Scheme output
 		  	var output_raw = output_res[0].toString();

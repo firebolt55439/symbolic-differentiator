@@ -67,6 +67,11 @@ h4 {
 	margin-bottom: 0.8em;
 }
 
+#error_text {
+	color: orange;
+	font-size: 1.1em;
+}
+
 /* .hljs-builtin-normal { color: #e6db74; }
 .hljs-builtin-special, .hljs-builtin-turtle { color: #a6e22e; }
 
