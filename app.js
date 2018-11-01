@@ -41,7 +41,12 @@ $(function() {
 		$('#error_box').show();
 		refreshCode();
 	};
+	var showedFirst = false;
 	var showSuccessColors = function() {
+		if(!showedFirst){
+			showedFirst = true;
+			return;
+		}
 		for(var box of lastBoxTyping){
 			$('#' + box).removeClass('syntax-outline').addClass('success-outline');
 		}
@@ -524,5 +529,7 @@ $(function() {
 	// Initialize output fields
 	var detectedVarsSpan = MQ.MathField(document.getElementById('detected_vars'), {});
 	var wrtDisplaySpan = MQ.MathField(document.getElementById('wrt_disp'), {});
-	showSuccessColors();
+	setTimeout(() => {
+		answerMathField.config().__options.handlers.fns.edit();
+	}, 100);
 });
