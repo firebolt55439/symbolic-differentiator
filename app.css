@@ -76,6 +76,10 @@ tbody th {
 	font-weight: 200 !important;
 }
 
+.mathjax-output .mjx-math {
+	margin-left: -0.4em;
+}
+
 /* .hljs-builtin-normal { color: #e6db74; }
 .hljs-builtin-special, .hljs-builtin-turtle { color: #a6e22e; }
 
