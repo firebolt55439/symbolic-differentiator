@@ -537,13 +537,33 @@ $(function() {
 		"\\sin (x^2+y^2)+y^x+\\sqrt{x^2}"
 	];
 	var getRandomElement = function(items) {
-		return items[Math.floor(Math.random()*items.length)];;
+		return items[Math.floor(Math.random()*items.length)];
 	};
 	var detectedVarsSpan = MQ.MathField(document.getElementById('detected_vars'), {});
 	var wrtDisplaySpan = MQ.MathField(document.getElementById('wrt_disp'), {});
 	setTimeout(() => {
-		// answerMathField.config().__options.handlers.fns.edit();
 		ignoreColors = 2;
 		answerMathField.latex(getRandomElement(SAMPLE_EXPRESSIONS));
 	}, 100);
+
+	// Initialize user buttons
+	$('#about_btn').click(function() {
+		$('#userModal').find(".modal-title").text("About");
+		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a> and tested by <a href="mailto:neelesh.r@berkeley.edu">Neelesh Ramachandran</a> at UC Berkeley.`;
+		$('#userModal').find(".modal-body").html(html_content);
+		jQuery.noConflict();
+		$('#userModal').modal('show');
+	});
+	$('#supported_fn_btn').click(function() {
+		$('#userModal').find(".modal-title").text("Supported Functions");
+		var html_content = "";
+		$('#userModal').find(".modal-body").html(html_content);
+		$('#userModal').modal('show');
+	});
+	$('#sample_btn').click(function() {
+		$('#userModal').find(".modal-title").text("Sample Expressions");
+		var html_content = "";
+		$('#userModal').find(".modal-body").html(html_content);
+		$('#userModal').modal('show');
+	});
 });
