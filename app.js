@@ -555,8 +555,8 @@ $(function() {
 		"e^{xyz^2}",
 		"x^{\\frac{2}{xyz}+e^x}",
 		"x^x\\ln \\left(e^{ex}\\right)",
-		"\\sqrt{\\sqrt{x^{\\frac{x}{y}}}+ x^{\\frac{xy}{z^x}}}"
-
+		"\\sqrt{\\sqrt{x^{\\frac{x}{y}}}+ x^{\\frac{xy}{z^x}}}",
+		"x^{3xy}"
 	];
 	var getRandomElement = function(items) {
 		return items[Math.floor(Math.random()*items.length)];

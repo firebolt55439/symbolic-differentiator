@@ -46,6 +46,9 @@
         ((and (product? a2) (number? (multiplier a2)) (< (multiplier a2) 0)) ; a + (-bc) = a - bc
           (make-subtraction a1 (make-product -1 a2))
         )
+        ((and (division? a1) (division? a2) (equal? (denominator a1) (denominator a2))) ; a/c + b/c = (a+b)/c
+          (make-div (make-sum (numerator a1) (numerator a2)) (denominator a1))
+        )
         (else (list '+ a1 a2))))
 (define (sum? x)
   (and (list? x) (eq? (car x) '+)))
@@ -368,6 +371,37 @@
 )
 
 ; Extension: division
+(define last-available-cancel nil)
+(define last-available-cancel-numerator nil)
+(define last-available-cancel-denominator nil)
+(define (can-cancel m1 m2)
+  (define (cancel-helper on in)
+    (cond
+      ((null? on) #f)
+      ((or (equal? on in) (contains-product-chain in on))
+        (set! last-available-cancel on)
+        #t
+      )
+      ((symbol? on) #f)
+      ((product? on) (or (cancel-helper (multiplier on) in) (cancel-helper (multiplicand on) in)))
+      (else #f)
+    )
+  ) ; TODO: generalize to exp chains, etc.
+  (if (cancel-helper m1 m2)
+    (begin
+      (if (equal? last-available-cancel m1)
+        (set! last-available-cancel-numerator 1)
+        (set! last-available-cancel-numerator (find-product-chain m1 last-available-cancel))
+      )
+      (if (equal? last-available-cancel m2)
+        (set! last-available-cancel-denominator 1)
+        (set! last-available-cancel-denominator (find-product-chain m2 last-available-cancel))
+      )
+      #t
+    )
+    #f
+  )
+)
 (define (make-div m1 m2)
   ; (console-log "Div called on" m1 m2)
   (cond ((and (=number? m1 0) (=number? m2 0)) (error "Division by zero"))
@@ -387,6 +421,10 @@
         ; ((and (product? m1) (number? (multiplier m1))) ; simplify (kx)/y = k*(x/y) ; leads to mutual recursion with make-product in case of \sqrt{x^3}
         ;   (make-product (multiplier m1) (make-div (multiplicand m1) m2))
         ; )
+        ((can-cancel m1 m2)
+          (console-log "Can cancel!" m1 m2 last-available-cancel)
+          (make-div last-available-cancel-numerator last-available-cancel-denominator)
+        )
         ((and (exp? m2) (number? (exponent m2)) (< (exponent m2) 0)) ; simplify negative exponents of form x/y^(-2) = xy^2
           (make-product m1 (make-exp (base m2) (- (exponent m2))))
         )
