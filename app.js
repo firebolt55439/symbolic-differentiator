@@ -549,7 +549,7 @@ $(function() {
 	// Initialize user buttons
 	$('#about_btn').click(function() {
 		$('#userModal').find(".modal-title").text("About");
-		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a>, Tested/Expanded by <a href="mailto:neelesh.r@berkeley.edu">Neelesh Ramachandran</a> at UC Berkeley.`;
+		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a>, Tested/Revised by <a href="mailto:neelesh.r@berkeley.edu">Neelesh Ramachandran</a> at UC Berkeley.`;
 		$('#userModal').find(".modal-body").html(html_content);
 		jQuery.noConflict();
 		$('#userModal').modal('show');
