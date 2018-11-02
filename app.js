@@ -547,23 +547,74 @@ $(function() {
 	}, 100);
 
 	// Initialize user buttons
-	$('#about_btn').click(function() {
-		$('#userModal').find(".modal-title").text("About");
-		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a> and tested by <a href="mailto:neelesh.r@berkeley.edu">Neelesh Ramachandran</a> at UC Berkeley.`;
-		$('#userModal').find(".modal-body").html(html_content);
+	var dynamicModalResize = function() {
+		$('#userModal').find('.modal-dialog').css({
+			"min-width": "200px",
+			"max-width": `${$('#userModal').find("table.table").width() + 18}px`
+		});
+	};
+	var displayModal = function() {
 		jQuery.noConflict();
 		$('#userModal').modal('show');
+		$('#userModal').find('.modal-dialog').css({
+			"max-width": "500px"
+		});
+	};
+	$('#about_btn').click(function() {
+		$('#userModal').find(".modal-title").text("About This Project");
+		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a> at UC Berkeley. <br style="line-height: 1.4em;" /> Inspired by CS61A Lab 9. <br style="line-height: 1.4em;" /> Tested by <a href="mailto:neelesh.r@berkeley.edu">Neelesh Ramachandran</a>.`;
+		$('#userModal').find(".modal-body").html(html_content);
+		displayModal();
 	});
 	$('#supported_fn_btn').click(function() {
 		$('#userModal').find(".modal-title").text("Supported Functions");
-		var html_content = "";
+		var html_content = $('<table class="table table-striped table-hover"><thead><tr><th scope="col">Description</th><th scope="col">Text</th><th scope="col">Formatted</th></tr></thead></table>');
+		var tbody = $('<tbody></tbody>');
+		var desc = {
+			"sin": "Sine",
+			"cos": "Cosine",
+			"tan": "Tangent",
+			"sinh": "Hyperbolic Sine",
+			"cosh": "Hyperbolic Cosine",
+			"tanh": "Hyperbolic Tangent",
+			"log": "Natural Log",
+			"ln": "Natural Log",
+			"sqrt": "Square Root",
+			// "abs": "Absolute Value",
+			"arcsin": "Inverse Sine",
+			"arccos": "Inverse Cosine",
+			"arctan": "Inverse Tangent"
+		};
+		for(var func of IMPLEMENTED_FUNCTIONS.split(" ")){
+			var row = $('<tr></tr>');
+			if(!(func in desc)){
+				continue;
+			}
+			$(`<th scope="row">${desc[func]}</th>`).appendTo(row);
+			$(`<th>${func}</th>`).appendTo(row);
+			$(`<th>\`${func}(x)\`</th>`).appendTo(row);
+			row.appendTo(tbody);
+		}
+		tbody.appendTo(html_content);
 		$('#userModal').find(".modal-body").html(html_content);
-		$('#userModal').modal('show');
+		MathJax.Hub.Queue(["Typeset", MathJax.Hub, '#userModal']);
+		MathJax.Hub.Queue(dynamicModalResize);
+		displayModal();
 	});
 	$('#sample_btn').click(function() {
 		$('#userModal').find(".modal-title").text("Sample Expressions");
-		var html_content = "";
+		var html_content = $('<table class="table table-striped table-hover"><thead><tr><th scope="col">Text</th><th scope="col">Formatted</th></tr></thead></table>');
+		var tbody = $('<tbody></tbody>');
+		for(var func of SAMPLE_EXPRESSIONS){
+			var row = $('<tr></tr>');
+			$(`<th scope="row">${func}</th>`).appendTo(row);
+			$(`<th>\`${func}\`</th>`).appendTo(row);
+			row.appendTo(tbody);
+		}
+		tbody.appendTo(html_content);
 		$('#userModal').find(".modal-body").html(html_content);
-		$('#userModal').modal('show');
+		MathJax.Hub.Queue(["Typeset", MathJax.Hub, '#userModal']);
+		MathJax.Hub.Queue(dynamicModalResize);
+		displayModal();
 	});
 });
