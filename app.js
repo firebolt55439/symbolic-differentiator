@@ -551,7 +551,12 @@ $(function() {
 	// Initialize output fields
 	const SAMPLE_EXPRESSIONS = [
 		"\\sqrt{x^3+y^3}",
-		"\\sin (x^2+y^2)+y^x+\\sqrt{x^2}"
+		"\\sin (x^2+y^2)+y^x+\\sqrt{x^2}",
+		"e^{xyz^2}",
+		"x^{\\frac{2}{xyz}+e^x}",
+		"x^x\\ln \\left(e^{ex}\\right)",
+		"\\sqrt{\\sqrt{x^{\\frac{x}{y}}}+ x^{\\frac{xy}{z^x}}}"
+
 	];
 	var getRandomElement = function(items) {
 		return items[Math.floor(Math.random()*items.length)];
