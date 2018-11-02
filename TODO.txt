@@ -10,7 +10,7 @@ x^2ye^{\frac{y}{z}}
 xyxyyzyxyyzyxyzyxyzxyyzxy
 e^{\sin \left(\pi xyz\right)}\cdot \pi xyz\cdot \left(\pi +x+y\pi xy\pi z\right)
 
-Every time it reloads, use a random sample expression as the starting one
+Implement highlight.js definition for Scheme operators
 Implement sidebar to switch between expression, relation and show gradient, mixed partial, etc. as well as samples
 Implement support for \sin ^2\left(x\right) notation
 	-> sin^2(x) notation needed
@@ -21,10 +21,6 @@ Support |x| notation
 Implement generic cancellation in fractions (e.g. (a1 * a2 * ... * an) / (b1 * b2 * ... * bn)) --> test case: xe^{x\ln \left(xyz\right)}
 Implement cancellation in conjunction with multiplication (a * 1/a = 1) --> test case: x^{3xy} OR xe^{x\ln \left(xyz\right)}
 
-Solve implicitly defined relations efficiently using the Implicit Function Theorem (no need for wonky chain rule stuff that way)
-	-> Implement in Scheme, move everything to one side, use make-div, optimize
-Add debug display textareas at bottom of page for LaTeX --> ASCII --> Scheme --> Parsed --> Derivative --> Infix --> ASCIIMath
-	-> Implement highlight.js to highlight expressions
 Find gradient with respect to detected variables
 Find all mixed partial derivatives to arbitrary order (fxx, fxy, fyy, fyx for n = 2, for example)
 

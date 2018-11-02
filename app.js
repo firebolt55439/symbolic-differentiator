@@ -452,15 +452,21 @@ $(function() {
 
 	// Initialize input box for expressions
 	var answerSpan = document.getElementById('answer');
+	var exprHandler = function() {
+		lastBoxTyping = ['answer'];
+		lastLatexEqn = answerMathField.latex(); // Get entered math in LaTeX format
+		setTimeout(handleOutputChange, 50);
+	};
+	var relationHandler = function() {
+		lastBoxTyping = ['answer_lhs', 'answer_rhs'];
+		lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
+		setTimeout(handleOutputChange, 50);
+	};
 	var answerMathField = MQ.MathField(answerSpan, {
 		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
 		autoCommands: GREEK_LETTERS + ' sqrt',
 		handlers: {
-			edit: function() {
-				lastBoxTyping = ['answer'];
-				lastLatexEqn = answerMathField.latex(); // Get entered math in LaTeX format
-				setTimeout(handleOutputChange, 50);
-			}
+			edit: exprHandler
 		}
 	});
 
@@ -469,22 +475,14 @@ $(function() {
 		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
 		autoCommands: GREEK_LETTERS + ' sqrt',
 		handlers: {
-			edit: function() {
-				lastBoxTyping = ['answer_lhs', 'answer_rhs'];
-				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
-				setTimeout(handleOutputChange, 50);
-			}
+			edit: relationHandler
 		}
 	});
 	var answerRightField = MQ.MathField(document.getElementById('answer_rhs'), {
 		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
 		autoCommands: GREEK_LETTERS + ' sqrt',
 		handlers: {
-			edit: function() {
-				lastBoxTyping = ['answer_lhs', 'answer_rhs'];
-				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
-				setTimeout(handleOutputChange, 50);
-			}
+			edit: relationHandler
 		}
 	});
 
@@ -523,11 +521,7 @@ $(function() {
 	var fnWrtDisplaySpan = MQ.MathField(document.getElementById('answer_fn'), {
 		autoCommands: GREEK_LETTERS,
 		handlers: {
-			edit: function() {
-				lastBoxTyping = ['answer_lhs', 'answer_rhs'];
-				lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
-				setTimeout(handleOutputChange, 50);
-			}
+			edit: relationHandler
 		}
 	});
 
@@ -550,7 +544,7 @@ $(function() {
 	var dynamicModalResize = function() {
 		$('#userModal').find('.modal-dialog').css({
 			"min-width": "200px",
-			"max-width": `${$('#userModal').find("table.table").width() + 18}px`
+			"max-width": `${$('#userModal').find("table.table").width() + 16 * 2 + 2}px`
 		});
 	};
 	var displayModal = function() {
