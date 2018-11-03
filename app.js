@@ -555,7 +555,6 @@ $(function() {
 		"e^{xyz^2}",
 		"x^{\\frac{2}{xyz}+e^x}",
 		"x^x\\ln \\left(e^{ex}\\right)",
-		"\\sqrt{\\sqrt{x^{\\frac{x}{y}}}+ x^{\\frac{xy}{z^x}}}",
 		"x^{3xy}"
 	];
 	var getRandomElement = function(items) {
@@ -568,7 +567,7 @@ $(function() {
 		answerMathField.latex(getRandomElement(SAMPLE_EXPRESSIONS));
 	}, 100);
 
-	// Initialize user buttons
+	// Initialize user-controlled buttons
 	var isModalHiding = false;
 	$('#userModal').on('hide.bs.modal', function() {
 		isModalHiding = true;
@@ -592,7 +591,7 @@ $(function() {
 	};
 	$('#about_btn').click(function() {
 		$('#userModal').find(".modal-title").text("About This Project");
-		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a> at UC Berkeley. <br style="line-height: 1.4em;" /> Inspired by CS61A Lab 9. <br style="line-height: 1.4em;" /> Tested by <a href="mailto:neelesh.r@berkeley.edu">Neelesh Ramachandran</a>.`;
+		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a> at UC Berkeley. <br style="line-height: 1.4em;" /> Inspired by CS61A Lab 9. <br style="line-height: 1.4em;" /> Tested by <a href="mailto:neelesh.r@berkeley.edu">Neelesh R.</a>.`;
 		$('#userModal').find(".modal-body").html(html_content);
 		displayModal();
 		return false;
@@ -658,5 +657,21 @@ $(function() {
 		MathJax.Hub.Queue(dynamicModalResize);
 		displayModal();
 		return false;
+	});
+
+	// Initialize top-right images
+	$('.top-right-image').each(function() {
+		$(this).css('background-image', `url("${$(this).data("img")}")`);
+	});
+	MathJax.Hub.Queue(function() {
+		$('.top-right-icon').each(function(index, el) {
+			setTimeout(function() {
+				$(el).addClass('top-right-fade');
+				setTimeout(function() {
+					$(el).addClass('top-right-transition');
+				}, 300);
+			}, (index * 350));
+		});
+		// $('.top-right-icon').fadeIn(500);
 	});
 });
