@@ -104,7 +104,7 @@ $(function() {
 		console.error(e);
 		showFailureColors();
 	});
-	biwa.evaluate("(load \"/diff.scm\")", function(result) {
+	biwa.evaluate("(load \"/assets/scm/diff.scm\")", function(result) {
 		console.log("Scheme environment loaded");
 	});
 
