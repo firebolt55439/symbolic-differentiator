@@ -13,6 +13,8 @@ e^{\sin \left(\pi xyz\right)}\cdot \pi xyz\cdot \left(\pi +x+y\pi xy\pi z\right)
 \sqrt{\sqrt{x^{\frac{x}{y}}}+\ x^{\frac{xy}{z^x}}}
 -> cancellation test case (see implement generic cancellation...)
 
+Obfuscate, minify JS + Scheme; consider grunt, webpack, or some build process task manager
+Publish to GitHub Pages; add gh-pages branch
 Implement highlight.js definition for Scheme operators
 Implement sidebar to switch between expression, relation and show gradient, mixed partial, etc. as well as samples
 Implement support for \sin ^2\left(x\right) notation

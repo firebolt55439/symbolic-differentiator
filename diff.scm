@@ -100,7 +100,7 @@
       (and (exp? (multiplier lst)) (equal? (base (multiplier lst)) var))
       (and (exp? (multiplicand lst)) (equal? (base (multiplicand lst)) var))
     )
-      (if (equal? (base (multiplier lst)) var)
+      (if (and (exp? (multiplier lst)) (equal? (base (multiplier lst)) var))
         (begin (set! last-product-exp-chain (exponent (multiplier lst))) (multiplicand lst))
         (begin (set! last-product-exp-chain (exponent (multiplicand lst))) (multiplier lst))
       )
@@ -422,7 +422,6 @@
         ;   (make-product (multiplier m1) (make-div (multiplicand m1) m2))
         ; )
         ((can-cancel m1 m2)
-          (console-log "Can cancel!" m1 m2 last-available-cancel)
           (make-div last-available-cancel-numerator last-available-cancel-denominator)
         )
         ((and (exp? m2) (number? (exponent m2)) (< (exponent m2) 0)) ; simplify negative exponents of form x/y^(-2) = xy^2
