@@ -60,6 +60,9 @@ workflows:
       - deploy:
           requires:
             - build
+          filters:
+            branches:
+              only: deploy
 
 # machine:
 #   node:
