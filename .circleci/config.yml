@@ -5,6 +5,9 @@ version: 2 # use CircleCI 2.0
 jobs: # a collection of steps
   build: # runs not using Workflows must have a `build` job as entry point
     <<: *defaults
+    branches:
+      only:
+        - deploy
     docker: # run the steps with Docker
       - image: circleci/ruby:2.5
     environment:
@@ -54,9 +57,6 @@ workflows:
   build-deploy:
     jobs:
       - build
-          filters:
-            branches:
-              only: deploy
       - deploy:
           requires:
             - build
