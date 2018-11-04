@@ -33,12 +33,11 @@ def gen_random_bytes(k):
 def run_rc4(k, text):
     cipher_chars = []
     random_byte_gen = gen_random_bytes(k)
-    ret = ""
     for char in text:
         byte = ord(char)
         cipher_byte = byte ^ next(random_byte_gen)
-        ret += chr(cipher_byte)
-    return ret
+        cipher_chars.append(cipher_byte)
+    return bytearray(cipher_chars)
 
 ### End RC4 implementation ###
 
@@ -49,7 +48,7 @@ def mangle(name):
 	key = ''.join(random.choice(string.ascii_lowercase) for x in range(256)) # from https://stackoverflow.com/questions/1957273/how-do-i-generate-a-random-string-of-length-x-a-z-only-in-python
 	k = initialize([ord(char) for char in key])
 	if not DEBUG:
-		mangled = base64.b64encode(bytearray(run_rc4(k, name), "utf8")).decode('utf8')
+		mangled = base64.b64encode(run_rc4(k, name)).decode("utf-8")
 	else:
 		mangled = name + "123"
 	mangle_map[name] = mangled

@@ -106,7 +106,7 @@ $(function() {
 	});
 	var envLoaded = false;
 	var unmangledFnName = "";
-	biwa.evaluate("(begin (load \"/o.scm\") __mangled__derive-infix)", function(result) {
+	biwa.evaluate("(begin (load \"/assets/scm/diff.scm\") __mangled__derive-infix)", function(result) {
 		unmangledFnName = result.toString().slice(1);
 		envLoaded = true;
 		console.log("Scheme environment loaded");
