@@ -28,6 +28,7 @@ jobs: # a collection of steps
       - persist_to_workspace:
           root: ./
           paths:
+            - .firebaserc
             - firebase.json
             - node_modules
             - _site
@@ -53,12 +54,12 @@ workflows:
   build-deploy:
     jobs:
       - build
+        filters:
+          branches:
+            only: deploy
       - deploy:
           requires:
             - build
-          filters:
-            branches:
-              only: deploy
 
 # machine:
 #   node:
