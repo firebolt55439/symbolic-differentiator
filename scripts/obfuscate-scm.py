@@ -33,11 +33,12 @@ def gen_random_bytes(k):
 def run_rc4(k, text):
     cipher_chars = []
     random_byte_gen = gen_random_bytes(k)
+    ret = ""
     for char in text:
         byte = ord(char)
         cipher_byte = byte ^ next(random_byte_gen)
-        cipher_chars.append(chr(cipher_byte))
-    return u''.join(cipher_chars)
+        ret += chr(cipher_byte)
+    return ret
 
 ### End RC4 implementation ###
 
