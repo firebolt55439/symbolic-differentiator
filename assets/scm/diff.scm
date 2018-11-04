@@ -275,7 +275,7 @@
     ((=number? base 0) 0)
     ((=number? exponent 0) 1)
     ((=number? exponent 1) base)
-    ((and (number? base) (number? exponent) (< exponent 3) (> exponent 0) (< base 5)) (expt base exponent)) ; evaluate for small numbers / powers
+    ((and (number? base) (number? exponent) (< exponent 3) (> exponent 0) (< base 5) (> base -5)) (expt base exponent)) ; evaluate for small numbers / powers
     ((exp? base) (make-exp (cadr base) (make-product (caddr base) exponent))) ; power of a power
     ((and (function? base) (eq? (car base) 'sqrt) (number? exponent)) ; sqrt(x)^a = x^(a/2)
       (make-exp (cadr base) (make-div exponent 2))
