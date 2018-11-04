@@ -850,3 +850,5 @@
     )
   )
 )
+
+(define __mangled__derive-infix 'derive-infix)
