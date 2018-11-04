@@ -105,7 +105,9 @@ $(function() {
 		showFailureColors();
 	});
 	var envLoaded = false;
-	biwa.evaluate("(load \"/assets/scm/diff.scm\")", function(result) {
+	var unmangledFnName = "";
+	biwa.evaluate("(begin (load \"/o.scm\") __mangled__derive-infix)", function(result) {
+		unmangledFnName = result.toString().slice(1);
 		envLoaded = true;
 		console.log("Scheme environment loaded");
 	});
@@ -356,13 +358,13 @@ $(function() {
 		if(ret.includes(" = ")){
 			fn_var = `'${fnWrtDisplaySpan.latex()}`;
 		} else {
-			fn_var = 'nil';
+			fn_var = '\'()';
 		}
 		while(wrt_arr.length > 0){
 			if(had_one){
 				ret = `(car ${ret})`;
 			}
-			ret = `(derive-infix ${ret} '${wrt_arr.shift()} ${fn_var})`;
+			ret = `(${unmangledFnName} ${ret} '${wrt_arr.shift()} ${fn_var})`;
 			had_one = true;
 		}
 		return ret;

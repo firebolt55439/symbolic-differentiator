@@ -316,9 +316,6 @@
   (and (list? exp) (eq? (car exp) '^))
 )
 
-(define x^2 (make-exp 'x 2))
-(define x^3 (make-exp 'x 3))
-
 ; Extension: chain rule and general power rule for exponents
 (define (derive-exp exp var)
   (if (number? (exponent exp))
@@ -537,7 +534,7 @@
     (cond
       ((null? expr) nil)
       ((list? (car expr))
-        (append '(left-paren) (flatten (car expr)) '(right-paren) (flatten (cdr expr)))
+        (append (list left-paren) (flatten (car expr)) (list right-paren) (flatten (cdr expr)))
       )
       (else (cons (car expr) (flatten (cdr expr))))
     )
@@ -831,7 +828,6 @@
     (begin
       (set! parsed-infix (make-subtraction (cadr parsed-infix) (caddr parsed-infix)))
     )
-    (set! imp-var nil)
   )
   (pass-message "Parsed Infix:" parsed-infix "parsed-infix")
   (define simplified-infix (alg-simplify parsed-infix))

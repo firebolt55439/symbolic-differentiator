@@ -30,12 +30,14 @@ jobs: # a collection of steps
           paths:
             - .firebaserc
             - firebase.json
+            - scripts
             - node_modules
             - _site
   deploy:
     <<: *defaults
     docker:
       - image: circleci/node:9.4.0
+      - image: circleci/python:3.6.5
     steps:
       - attach_workspace:
           at: ./
@@ -51,6 +53,9 @@ jobs: # a collection of steps
       - run:
           name: Obfuscate JS 2nd Pass
           command: ./node_modules/.bin/javascript-obfuscator _site/assets/js/app.js --string-array-encoding rc4 --output _site/assets/js/app.js
+      - run:
+          name: Obfuscate Scheme 1st Pass
+          command: python scripts/obfuscate-scm.py _site/assets/scm/diff.scm _site/assets/scm/diff.scm
       - run:
           name: Deploy Site
           command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN --non-interactive
