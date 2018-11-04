@@ -23,12 +23,6 @@ jobs: # a collection of steps
           paths:
             - vendor/bundle
       - run:
-          name: Obfuscate JS 1st Pass
-          command: ./node_modules/.bin/javascript-obfuscator assets/js/app.js --string-array-encoding rc4 --output assets/js/app.js
-      - run:
-          name: Obfuscate JS 2nd Pass
-          command: ./node_modules/.bin/javascript-obfuscator assets/js/app.js --string-array-encoding rc4 --output assets/js/app.js
-      - run:
           name: Jekyll Build
           command: bundle exec jekyll build --verbose
       - persist_to_workspace:
@@ -51,6 +45,12 @@ jobs: # a collection of steps
       # - run:
       #     name: Install Firebase Tools
       #     command: 'sudo npm install -g firebase-tools'
+      - run:
+          name: Obfuscate JS 1st Pass
+          command: ./node_modules/.bin/javascript-obfuscator _site/assets/js/app.js --string-array-encoding rc4 --output _site/assets/js/app.js
+      - run:
+          name: Obfuscate JS 2nd Pass
+          command: ./node_modules/.bin/javascript-obfuscator _site/assets/js/app.js --string-array-encoding rc4 --output _site/assets/js/app.js
       - run:
           name: Deploy Site
           command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN --non-interactive
