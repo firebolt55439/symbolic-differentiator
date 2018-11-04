@@ -23,6 +23,12 @@ jobs: # a collection of steps
           paths:
             - vendor/bundle
       - run:
+          name: Obfuscate JS 1st Pass
+          command: ./node_modules/.bin/javascript-obfuscator assets/js/app.js --string-array-encoding rc4 --output assets/js/app.js
+      - run:
+          name: Obfuscate JS 2nd Pass
+          command: ./node_modules/.bin/javascript-obfuscator assets/js/app.js --string-array-encoding rc4 --output assets/js/app.js
+      - run:
           name: Jekyll Build
           command: bundle exec jekyll build --verbose
       - persist_to_workspace:
