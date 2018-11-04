@@ -38,12 +38,12 @@ jobs: # a collection of steps
       steps:
         - attach_workspace:
             at: ./
-        - run:
-            name: Update NPM
-            command: 'sudo npm install -g npm@latest'
-        - run:
-            name: Install Firebase Tools
-            command: 'sudo npm install -g firebase-tools'
+        # - run:
+        #     name: Update NPM
+        #     command: 'sudo npm install -g npm@latest'
+        # - run:
+        #     name: Install Firebase Tools
+        #     command: 'sudo npm install -g firebase-tools'
         - run:
             name: Deploy Site
             command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN --non-interactive
