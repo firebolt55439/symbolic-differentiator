@@ -351,7 +351,7 @@
         ((=number? a2 0) a1)
         ((and (number? a1) (number? a2)) (- a1 a2))
         ((equal? a1 a2) 0)
-        ((and (product? a2) (or (=number? (multiplier a2) -1) (=number? (multiplicand a2) -1)))
+        ((and (product? a2) (or (=number? (multiplier a2) -1) (=number? (multiplicand a2) -1))) ; a - (-b) = a + b
           (if (=number? (multiplier a2) -1)
             (make-sum a1 (multiplicand a2))
             (make-sum a1 (multiplier a2))
@@ -359,6 +359,21 @@
         )
         ((and (product? a2) (number? (multiplier a2)) (< (multiplier a2) 0)) ; a - (-bc) = a + b
           (make-sum a1 (make-product -1 a2))
+        )
+        ((and (sum? a1) (or (equal? (addend a1) a2) (equal? (augend a1) a2))) ; (a + b) - a = b
+          (if (equal? (addend a1) a2)
+            (augend a1)
+            (addend a1)
+          )
+        )
+        ((and (subtraction? a1) (equal? (addend a1) a2)) ; (a - b) - a = b
+          (make-product -1 (augend a1))
+        )
+        ((sum? a2) ; a - (b + c) = (a - b) - c
+          (make-subtraction (make-subtraction a1 (addend a2)) (augend a2))
+        )
+        ((subtraction? a2) ; a - (b - c) = a - b + c
+          (make-sum (make-subtraction a1 (addend a2)) (augend a2))
         )
         (else (list '- a1 a2))))
 (define (subtraction? x)
