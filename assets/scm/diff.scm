@@ -28,16 +28,16 @@
   (cond ((=number? a1 0) a2)
         ((=number? a2 0) a1)
         ((and (number? a1) (number? a2)) (+ a1 a2))
-        ((and (product? a1) (or (=number? (multiplier a1) -1) (=number? (multiplicand a1) -1)))
+        ((equal? a1 a2) ; x + x = 2x
+          (make-product 2 a1)
+        )
+        ((and (product? a1) (or (=number? (multiplier a1) -1) (=number? (multiplicand a1) -1))) ; -a + b = b - a
           (if (=number? (multiplier a1) -1)
             (make-subtraction a2 (multiplicand a1))
             (make-subtraction a2 (multiplier a1))
           )
         )
-        ((equal? a1 a2)
-          (make-product 2 a1)
-        )
-        ((and (product? a2) (or (=number? (multiplier a2) -1) (=number? (multiplicand a2) -1)))
+        ((and (product? a2) (or (=number? (multiplier a2) -1) (=number? (multiplicand a2) -1))) ; reverse of above rule
           (make-sum a2 a1)
         )
         ((and (number? a2) (not (number? a1))) ; make constants go in front
@@ -782,8 +782,8 @@
             (< (cadr left) cur_precedence)
             (and
               (= (cadr left) cur_precedence)
-              (not (eq? (cadr (cdr left)) (car expr))) ; put parenthesis if operators don't match up
               (or
+                (not (eq? (cadr (cdr left)) (car expr))) ; put parenthesis if operators don't match up
                 (not (contains safe-operators (caddr left))) ; and either not "safe" operators (e.g. * and + is safe)
                 (not (contains safe-operators (car expr))) ; or current operator is not safe
               )
@@ -798,8 +798,8 @@
             (< (cadr right) cur_precedence)
             (and
               (= (cadr right) cur_precedence) ; if same precedence, then
-              (not (eq? (cadr (cdr right)) (car expr))) ; put parenthesis if operators don't match up
               (or
+                (not (eq? (cadr (cdr right)) (car expr))) ; put parenthesis if operators don't match up
                 (not (contains safe-operators (caddr right))) ; and either not "safe" operators (e.g. * and + is safe)
                 (not (contains safe-operators (car expr))) ; or current operator is not safe
               )
