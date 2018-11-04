@@ -104,7 +104,9 @@ $(function() {
 		console.error(e);
 		showFailureColors();
 	});
+	var envLoaded = false;
 	biwa.evaluate("(load \"/assets/scm/diff.scm\")", function(result) {
+		envLoaded = true;
 		console.log("Scheme environment loaded");
 	});
 
@@ -369,6 +371,13 @@ $(function() {
 	var lastLatexEqn = "x";
 	var lastDetectedVarNum = 1;
 	var handleOutputChange = function(wrt) {
+		// Wait for environment to load
+		if(!envLoaded){
+			return setTimeout(function() {
+				handleOutputChange(wrt);
+			}, 300);
+		}
+
 		// Modify DOM element
 		if(ignoreColors > 0){
 			if(--ignoreColors >= 1){
