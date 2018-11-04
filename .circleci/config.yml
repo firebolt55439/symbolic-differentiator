@@ -32,13 +32,16 @@ jobs: # a collection of steps
   deploy:
       <<: *defaults
       docker:
-        - image: circleci/node:6.10.3
+        - image: circleci/node:9.4.0
       steps:
         - attach_workspace:
             at: ./
         - run:
             name: Update NPM
             command: 'sudo npm install -g npm@latest'
+        - run:
+            name: Clean NPM Cache
+            command: 'sudo npm cache clean'
         - run:
             name: Install Firebase Tools
             command: 'sudo npm install -g firebase-tools'
@@ -48,7 +51,7 @@ jobs: # a collection of steps
 
 workflows:
   version: 2
-  test-deploy:
+  build-deploy:
     jobs:
       - build
       - deploy:
@@ -56,7 +59,7 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: deploy
 
 # machine:
 #   node:
