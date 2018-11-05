@@ -275,7 +275,13 @@
     ((=number? base 0) 0)
     ((=number? exponent 0) 1)
     ((=number? exponent 1) base)
-    ((and (number? base) (number? exponent) (< exponent 3) (> exponent 0) (< base 5) (> base -5)) (expt base exponent)) ; evaluate for small numbers / powers
+    ((and (number? base) (number? exponent)
+      (or
+        (and (< exponent 3) (> exponent 0) (< base 5) (> base -5))
+        (< (abs (expt base exponent)) 200)
+      ))
+      (expt base exponent)
+    ) ; evaluate for small numbers / powers
     ((exp? base) (make-exp (cadr base) (make-product (caddr base) exponent))) ; power of a power
     ((and (function? base) (eq? (car base) 'sqrt) (number? exponent)) ; sqrt(x)^a = x^(a/2)
       (make-exp (cadr base) (make-div exponent 2))
@@ -318,27 +324,32 @@
 
 ; Extension: chain rule and general power rule for exponents
 (define (derive-exp exp var)
-  (if (number? (exponent exp))
-    (make-product
-      (exponent exp)
+  (cond
+    ((and (number? (exponent exp)) (number? (base exp))) 0)
+    ((number? (exponent exp))
       (make-product
-        (make-exp (base exp) (make-subtraction (exponent exp) 1))
-        (if (number? (base exp)) 1 (derive (base exp) var))
+        (exponent exp)
+        (make-product
+          (make-exp (base exp) (make-subtraction (exponent exp) 1))
+          (if (number? (base exp)) 1 (derive (base exp) var))
+        )
       )
     )
-    (make-product
-      (make-exp (base exp) (exponent exp))
-      (make-sum
-        (make-product
-          (derive (base exp) var)
-          (make-div
-            (exponent exp)
-            (base exp)
+    (else
+      (make-product
+        (make-exp (base exp) (exponent exp))
+        (make-sum
+          (make-product
+            (derive (base exp) var)
+            (make-div
+              (exponent exp)
+              (base exp)
+            )
           )
-        )
-        (make-product
-          (derive (exponent exp) var)
-          (make-ln (base exp))
+          (make-product
+            (derive (exponent exp) var)
+            (make-ln (base exp))
+          )
         )
       )
     )
@@ -860,7 +871,10 @@
   (if (not (list? ret))
     (derivative-dne "Could not take derivative")
     (begin
-      (pass-message "" (car ret) "derivative-infix")
+      (if (and (= (length (car ret)) 1) (number? (car (car ret))))
+        (pass-message "" (car (car ret)) "derivative-infix")
+        (pass-message "" (car ret) "derivative-infix")
+      )
       (list (car ret) seen-variables)
     )
   )

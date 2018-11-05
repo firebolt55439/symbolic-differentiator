@@ -602,7 +602,7 @@ $(function() {
 	};
 	$('#about_btn').click(function() {
 		$('#userModal').find(".modal-title").text("About This Project");
-		var html_content = `Developed by <a href="mailto:sumer.kohli@berkeley.edu">Sumer Kohli</a> at UC Berkeley. <br style="line-height: 1.4em;" /> Inspired by CS61A Lab 9. <br style="line-height: 1.4em;" /> Tested by <a href="mailto:neelesh.r@berkeley.edu">Neelesh R.</a>.`;
+		var html_content = `Developed by <a target="_blank" href="https://linkedin.com/in/sumerkohli">Sumer Kohli</a> at UC Berkeley. <br style="line-height: 1.4em;" /> Inspired by CS61A Lab 9. <br style="line-height: 1.4em;" /> Tested by <a target="_blank" href="https://www.linkedin.com/in/neelesh-ramachandran">Neelesh R.</a>.`;
 		$('#userModal').find(".modal-body").html(html_content);
 		displayModal();
 		return false;
