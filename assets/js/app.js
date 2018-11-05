@@ -633,6 +633,19 @@ $(function() {
 			"max-width": "500px"
 		});
 		$('#userModal').modal('show');
+
+		// Close modal button can be finnicky for some reason on Chrome
+		$('#userModal').find('.btn-close-modal').unbind("click");
+		$('#userModal').find('.btn-close-modal').click(function(e) {
+			e.preventDefault();
+			jQuery.noConflict();
+			$('#userModal').modal('hide');
+			setTimeout(function() {
+				if(isModalHiding) return;
+				jQuery.noConflict();
+				$('#userModal').modal('hide');
+			}, 300);
+		});
 	};
 	$('#about_btn').click(function() {
 		$('#userModal').find(".modal-title").text("About This Project");
