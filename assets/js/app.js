@@ -10,7 +10,7 @@ String.prototype.replaceAll = function(search, replacement) {
 
 $(function() {
 	// Define DOM helper functions for status updates and the like
-	var allBoxes = ['answer', 'answer_lhs', 'answer_rhs'];
+	var allBoxes = ['answer', 'answer_lhs', 'answer_rhs', 'order_num', 'wrt_arr'];
 	allBoxes.map(x => $('#' + x).addClass('init-outline'));
 	var lastBoxTyping = [];
 	var prepCodeArea = function() {
@@ -32,8 +32,7 @@ $(function() {
 	var hideError = function() {
 		$('#error_box').hide();
 		for(var box of allBoxes){
-			$('#' + box).removeClass('syntax-outline').removeClass('success-outline')
-			;
+			$('#' + box).removeClass('syntax-outline').removeClass('success-outline');
 		}
 	};
 	var displayError = function(err) {
@@ -228,11 +227,46 @@ $(function() {
 							break;
 						}
 					}
-					out_str += latex.slice(from + 1, i);
-					continue;
+					letter = latex.slice(from + 1, i);
 				}
 				out_str += " " + letter;
-				if(GREEK_LETTERS.includes(letter)){
+				if(IMPLEMENTED_FUNCTIONS.split(' ').includes(letter) && i + 1 < latex.length){
+					var j = i;
+					while(++j < latex.length && latex[j] === " ") ;
+					next_non_space = latex[j];
+					if(next_non_space === "^"){
+						// Handle sin^2(x) or similar expression
+						var start_of_exponent = j;
+						var func_exponent = next_non_space;
+						while(++j < latex.length && latex[j] === " ") ;
+						func_exponent = latex[j];
+
+						// Find end of exponent
+						var end_of_exponent = j;
+						if(func_exponent == "\{"){
+							var counter = 1;
+							while(counter && ++end_of_exponent < latex.length){
+								if(latex[end_of_exponent] === "\{") ++counter;
+								else if(latex[end_of_exponent] === "\}") --counter;
+								if(!counter) break;
+							}
+						}
+
+						// Find end of function parentheses grouping
+						j = end_of_exponent;
+						while(++j < latex.length && latex[j] !== "(") ;
+						counter = 1;
+						while(counter && ++j < latex.length){
+							if(latex[j] == "(") ++counter;
+							else if(latex[j] == ")") --counter;
+							if(!counter) break;
+						}
+						var end_of_fn_call = j;
+						var exponent_part = latex.slice(start_of_exponent, end_of_exponent + 1);
+						var fn_call_part = latex.slice(end_of_exponent + 1, end_of_fn_call + 1);
+						latex = latex.slice(0, start_of_exponent) + fn_call_part + " " + exponent_part + latex.slice(end_of_fn_call + 1);
+					}
+				} else if(GREEK_LETTERS.split(' ').includes(letter)){
 					next_non_space = next;
 					out_str += " ";
 					if(next !== ""){
@@ -538,7 +572,7 @@ $(function() {
 		handlers: {
 			edit: function() {
 				setTimeout(() => {
-					lastBoxTyping = ['answer'];
+					lastBoxTyping = ['answer', 'wrt_arr'];
 					handleOutputChange(wrtArrMathField.latex());
 				}, 50);
 			}
@@ -547,7 +581,7 @@ $(function() {
 	var orderNumMathField = MQ.MathField(document.getElementById('order_num'), {
 		handlers: {
 			edit: function() {
-				lastBoxTyping = ['answer'];
+				lastBoxTyping = ['answer', 'order_num'];
 				setTimeout(handleOutputChange, 50);
 			}
 		}
@@ -565,7 +599,7 @@ $(function() {
 		"\\sin (x^2+y^2)+y^x+\\sqrt{x^2}",
 		"e^{xyz^2}",
 		"x^{\\frac{2}{xyz}+e^x}",
-		"x^x\\ln \\left(e^{ex}\\right)",
+		"x^x\\cdot \\ln \\left(e^{ex}\\right)",
 		"x^{3xy}"
 	];
 	var getRandomElement = function(items) {
@@ -683,6 +717,5 @@ $(function() {
 				}, 300);
 			}, (index * 350));
 		});
-		// $('.top-right-icon').fadeIn(500);
 	});
 });

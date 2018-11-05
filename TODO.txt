@@ -16,10 +16,7 @@ e^{\sin \left(\pi xyz\right)}\cdot \pi xyz\cdot \left(\pi +x+y\pi xy\pi z\right)
 Allow turning debug output off/on
 Implement highlight.js definition for Scheme operators
 Implement sidebar to switch between expression, relation and show gradient, mixed partial, etc. as well as samples
-Implement support for \sin ^2\left(x\right) notation
-	-> sin^2(x) notation needed
-Implement inverse trig functions
-	-> Allow both sin^-1 (x) and arcsin(x) notation
+Allow both sin^-1 (x) and arcsin(x) notation for inverse trig functions
 Support |x| notation
 	-> Handle in LaTeX to ASCII; simply wrap in abs(x) recursively, handle nesting
 Implement generic cancellation in fractions (e.g. (a1 * a2 * ... * an) / (b1 * b2 * ... * bn)) --> test case: xe^{x\ln \left(xyz\right)}
@@ -27,8 +24,4 @@ Implement cancellation in conjunction with multiplication (a * 1/a = 1) --> test
 
 Find gradient with respect to detected variables
 Find all mixed partial derivatives to arbitrary order (fxx, fxy, fyy, fyx for n = 2, for example)
-
-Improve web interface
-Add sidebar with sample derivatives (make them super ugly seeming / hard and ensure they all work)
-Add view in WolframAlpha button / shortcut
 
