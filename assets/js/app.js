@@ -622,9 +622,11 @@ $(function() {
 	});
 	var dynamicModalResize = function() {
 		if(isModalHiding) return;
+		var computed_width = $('#userModal').find("table.table").width() + 16 * 2 + 2;
+		if(computed_width < 500) return;
 		$('#userModal').find('.modal-dialog').css({
 			"min-width": "200px",
-			"max-width": `${$('#userModal').find("table.table").width() + 16 * 2 + 2}px`
+			"max-width": `${computed_width}px`
 		});
 	};
 	var displayModal = function() {
@@ -638,13 +640,9 @@ $(function() {
 		$('#userModal').find('.btn-close-modal').unbind("click");
 		$('#userModal').find('.btn-close-modal').click(function(e) {
 			e.preventDefault();
-			jQuery.noConflict();
-			$('#userModal').modal('hide');
 			setTimeout(function() {
-				if(isModalHiding) return;
-				jQuery.noConflict();
-				$('#userModal').modal('hide');
-			}, 300);
+				$('#userModal').find('button.close').click();
+			}, 70);
 		});
 	};
 	$('#about_btn').click(function() {
