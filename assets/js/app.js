@@ -290,7 +290,7 @@ $(function() {
 				on = ")";
 			}
 			out_str += on;
-			if(on == ")" && (isLetter(next_non_space) || isNumber(next_non_space) || next_non_space === "\\")){
+			if(on == ")" && (isLetter(next_non_space) || isNumber(next_non_space) || next_non_space === "\\" || next_non_space === "(")){
 				out_str += " * ";
 			}
 			if(adding_slash){
