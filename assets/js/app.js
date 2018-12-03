@@ -16,6 +16,7 @@ $(function() {
 	var sendEvent = function(category, action, label, value) {
 		setTimeout(function() {
 			ga('send', 'event', category, action, label, value);
+			console.info("ga", category, action, label, value)
 		}, 50);
 	};
 	var prepCodeArea = function() {
