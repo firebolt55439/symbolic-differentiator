@@ -12,12 +12,23 @@
         "destination": "/index.html"
       }
     ],
-    "headers": [{
-      "source" : "**/*.html",
-      "headers" : [{
-        "key" : "Cache-Control",
-        "value" : "max-age=300"
-      }]
-    }]
+    "headers": [
+      {
+        "source" : "/**",
+        "headers" : [{
+          "key" : "Cache-Control",
+          "value" : "max-age=300"
+        }]
+      },{
+        "source":
+          "**/*.@(jpg|jpeg|gif|png|svg|webp|js|css|eot|otf|ttf|ttc|woff)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=86400"
+          }
+        ]
+      }
+    ]
   }
 }
