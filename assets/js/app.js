@@ -15,7 +15,11 @@ $(function() {
 	var lastBoxTyping = [];
 	var sendEvent = function(category, action, label, value) {
 		setTimeout(function() {
-			ga('send', 'event', category, action, label, value);
+			gtag('event', action, {
+				'event_category': category,
+				'event_label': label,
+				'value': value
+			});
 			console.info("ga", category, action, label, value)
 		}, 50);
 	};
