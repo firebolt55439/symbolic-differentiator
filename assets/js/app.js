@@ -536,13 +536,13 @@ $(function() {
 		lastBoxTyping = ['answer'];
 		lastLatexEqn = answerMathField.latex(); // Get entered math in LaTeX format
 		setTimeout(handleOutputChange, 50);
-		sendEvent("Interface", "execute", "exprHandler", lastLatexEqn);
+		// sendEvent("Interface", "execute", "exprHandler", lastLatexEqn);
 	};
 	var relationHandler = function() {
 		lastBoxTyping = ['answer_lhs', 'answer_rhs'];
 		lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
 		setTimeout(handleOutputChange, 50);
-		sendEvent("Interface", "execute", "relationHandler", lastLatexEqn);
+		// sendEvent("Interface", "execute", "relationHandler", lastLatexEqn);
 	};
 	var answerMathField = MQ.MathField(answerSpan, {
 		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
