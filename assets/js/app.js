@@ -13,6 +13,11 @@ $(function() {
 	var allBoxes = ['answer', 'answer_lhs', 'answer_rhs', 'order_num', 'wrt_arr'];
 	allBoxes.map(x => $('#' + x).addClass('init-outline'));
 	var lastBoxTyping = [];
+	var sendEvent = function(category, action, label, value) {
+		setTimeout(function() {
+			ga('send', 'event', category, action, label, value);
+		}, 50);
+	};
 	var prepCodeArea = function() {
 		$('code.scheme').each(function(i, block){
 			$(block).html("");
@@ -102,6 +107,7 @@ $(function() {
 	var biwa = new BiwaScheme.Interpreter(function(e) {
 		console.error(e);
 		showFailureColors();
+		sendEvent("Differentiator", "execute", "failure_eval", lastLatexEqn);
 	});
 	var envLoaded = false;
 	var unmangledFnName = "";
@@ -469,6 +475,7 @@ $(function() {
 		var is_implicit = ascii_rep.includes(" = ");
 		biwa.evaluate(scheme_cmd, function(result) {
 			// Update DOM accordingly
+		  	sendEvent("Differentiator", "execute", "success_eval", ascii_rep);
 		  	showSuccessColors();
 		  	var output_res = result.to_array();
 	  	  	if(wrtNum == 1){
@@ -524,11 +531,13 @@ $(function() {
 		lastBoxTyping = ['answer'];
 		lastLatexEqn = answerMathField.latex(); // Get entered math in LaTeX format
 		setTimeout(handleOutputChange, 50);
+		sendEvent("Interface", "execute", "exprHandler", lastLatexEqn);
 	};
 	var relationHandler = function() {
 		lastBoxTyping = ['answer_lhs', 'answer_rhs'];
 		lastLatexEqn = answerLeftField.latex() + "=" + answerRightField.latex(); // Get entered math in LaTeX format
 		setTimeout(handleOutputChange, 50);
+		sendEvent("Interface", "execute", "relationHandler", lastLatexEqn);
 	};
 	var answerMathField = MQ.MathField(answerSpan, {
 		autoOperatorNames: IMPLEMENTED_FUNCTIONS,
@@ -562,6 +571,7 @@ $(function() {
 			edit: function() {
 				lastBoxTyping = ['answer'];
 				setTimeout(handleOutputChange, 50);
+				sendEvent("Interface", "execute", "wrt", $('#wrt').val());
 			}
 		}
 	});
@@ -575,6 +585,7 @@ $(function() {
 					lastBoxTyping = ['answer', 'wrt_arr'];
 					handleOutputChange(wrtArrMathField.latex());
 				}, 50);
+				sendEvent("Interface", "execute", "wrt_arr", wrtArrMathField.latex());
 			}
 		}
 	});
@@ -583,6 +594,7 @@ $(function() {
 			edit: function() {
 				lastBoxTyping = ['answer', 'order_num'];
 				setTimeout(handleOutputChange, 50);
+				sendEvent("Interface", "execute", "order_num", $('#order_num').val());
 			}
 		}
 	});
@@ -650,6 +662,7 @@ $(function() {
 		var html_content = `Developed by <a target="_blank" href="https://linkedin.com/in/sumerkohli">Sumer Kohli</a> at UC Berkeley. <br style="line-height: 1.4em;" /> Inspired by CS61A Lab 9. <br style="line-height: 1.4em;" /> Tested by <a target="_blank" href="https://www.linkedin.com/in/neelesh-ramachandran">Neelesh R.</a>.`;
 		$('#userModal').find(".modal-body").html(html_content);
 		displayModal();
+		sendEvent("Modal", "view", "About", true);
 		return false;
 	});
 	$('#supported_fn_btn').click(function() {
@@ -695,6 +708,7 @@ $(function() {
 		MathJax.Hub.Queue(["Typeset", MathJax.Hub, '#userModal']);
 		MathJax.Hub.Queue(dynamicModalResize);
 		displayModal();
+		sendEvent("Modal", "view", "Supported Functions", true);
 		return false;
 	});
 	$('#sample_btn').click(function() {
@@ -712,6 +726,7 @@ $(function() {
 		MathJax.Hub.Queue(["Typeset", MathJax.Hub, '#userModal']);
 		MathJax.Hub.Queue(dynamicModalResize);
 		displayModal();
+		sendEvent("Modal", "view", "Sample Expressions", true);
 		return false;
 	});
 
