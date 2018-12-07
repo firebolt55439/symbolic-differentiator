@@ -119,71 +119,9 @@ tbody th {
 	right: 15px;
 }
 
-.box {
-  position: relative;
-  max-width: 600px;
-  width: 90%;
-  height: 400px;
-  background: #fff;
-  box-shadow: 0 0 15px rgba(0,0,0,.1);
-}
-
-/* common */
-.ribbon {
-  width: 180px;
-  height: 180px;
-  overflow: hidden;
-  position: absolute;
-}
-.ribbon::before,
-.ribbon::after {
-  position: absolute;
-  z-index: -1;
-  content: '';
-  display: block;
-  border: 5px solid #2980b9;
-}
-.ribbon span {
-  position: absolute;
-  display: block;
-  width: 225px;
-  padding: 15px 0;
-  background-color: #3498db;
-  box-shadow: 0 5px 10px rgba(0,0,0,.1);
-  color: #fff;
-  font: 700 18px/1 'Lato', sans-serif;
-  text-shadow: 0 1px 1px rgba(0,0,0,.2);
-  text-transform: uppercase;
-  text-align: center;
-}
-
-/* top left*/
-.ribbon-top-left {
-  top: 0px;
-  left: 0px;
-}
-.ribbon-top-left::before,
-.ribbon-top-left::after {
-  border-top-color: transparent;
-  border-left-color: transparent;
-}
-.ribbon-top-left::before {
-  top: 0;
-  right: 0;
-}
-.ribbon-top-left::after {
-  bottom: 0;
-  left: 0;
-}
-.ribbon-top-left span {
-  right: -25px;
-  top: 30px;
-  transform: rotate(-45deg);
-}
-
 .corner-ribbon{
   font: 700 18px/1 'Calibri', sans-serif;
-  width: 300px;
+  width: 325px;
   background: #e43;
   position: absolute;
   top: 25px;
@@ -209,8 +147,8 @@ tbody th {
 /* Different positions */
 
 .corner-ribbon.top-left{
-  top: 50px;
-  left: -75px;
+  top: 58px;
+  left: -80px;
   transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
 }
