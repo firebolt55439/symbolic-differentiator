@@ -753,4 +753,6 @@ $(function() {
 			}, (index * 350));
 		});
 	});
+	jQuery.noConflict();
+	$('[data-toggle="tooltip"]').tooltip();
 });
